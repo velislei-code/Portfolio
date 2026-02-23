@@ -1,5 +1,13 @@
 <?php
-
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2025-2026
+ *   Sistemas CTRL de Execução Tickets(Config de cctos Ip Dedicado/VPN) PHP/MySQL 
+ *   Projeto, excecução p/ ViVo S/A
+ *   All Rights Reserveds       
+ */
+ 
 	header("Content-Type: application/vnd.ms-excel");
 	header("Expires: 0");
 	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");

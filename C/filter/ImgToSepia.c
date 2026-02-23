@@ -3,9 +3,7 @@
  * by: Treuk, Velislei A
  * email: velislei@gmail.com
  * 31/Jul/2024
- * Program: Detect tipo arq
- *          Este programa faz uma verificacao do tipo de arquivo, consultando os valores,
- *          nos bytes do cabecario do mesmo.
+ * Program: Filter Image
  */
 #include <stdio.h>
 #include <math.h> // round()

@@ -1,3 +1,13 @@
+
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2014-2016
+ *   Sistemas de testes de portas ADSL em Massa 
+ *   Projeto, excecução p/ Oi S/A
+ *   All Rights Reserveds       
+ */
+ 
 import javax.swing.*;
 import java.awt.event.*;
 

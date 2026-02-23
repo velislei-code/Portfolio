@@ -1,4 +1,13 @@
 <?Php
+
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2025-2026
+ *   Sistemas CTRL de Execução Tickets(Config de cctos Ip Dedicado/VPN) PHP/MySQL 
+ *   Projeto, excecução p/ ViVo S/A
+ *   All Rights Reserveds       
+ */
 	
 	$AttribPosAbaA = 1; // Posi��o das abas "A" (Declara Antes di Include)
 	$BotaoVoltar = 0;					// Desabilita bot�o Voltar

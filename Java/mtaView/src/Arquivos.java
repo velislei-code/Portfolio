@@ -1,5 +1,12 @@
-//package mtaview;
-
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2014-2016
+ *   Sistemas de testes de portas ADSL em Massa 
+ *   Projeto, excecuÃ§Ã£o p/ Oi S/A
+ *   All Rights Reserveds       
+ */
+ 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,7 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.nikhaldimann.inieditor.IniEditor;
-/* MANIPULAÇÃO DE ARQUIVOS INI 
+/* MANIPULAï¿½ï¿½O DE ARQUIVOS INI 
 *
 * import java.io.File;
 * import java.io.IOException;
@@ -49,12 +56,12 @@ public class Arquivos extends JFrame {
   
 	/*
 	 *  Cria uma var do FormPrincipal, instancia, torna herdeiro	
-	 * O Cmd abaixo deveria mas não funcionou....
+	 * O Cmd abaixo deveria mas nï¿½o funcionou....
 	 * 		private mtaView mtaFrmPrincipal;
 	 *  	mtaFrmPrincipal.FixeLinAtual(0);
 	 *  
-	 * bTabAlterada criada para acessar info, a partir do FrmPrincipal e lá alterar, 
-	 * pois Não consegui alterar valor da LinAtual a partir do FrmOpc(daqui para lá)
+	 * bTabAlterada criada para acessar info, a partir do FrmPrincipal e lï¿½ alterar, 
+	 * pois Nï¿½o consegui alterar valor da LinAtual a partir do FrmOpc(daqui para lï¿½)
 	 */	
 	static boolean bTabAlterada = false;	
 	public void FixeTabAlterada(boolean bT){ bTabAlterada = bT; }
@@ -87,11 +94,11 @@ public class Arquivos extends JFrame {
 	  
 	  if(sExtencao == "mta"){		  
 		  	FileNameExtensionFilter FiltrarExtencao = new FileNameExtensionFilter("Arquivos mta(*.mta)", "mta"); 
-		  	objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenção
+		  	objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenï¿½ï¿½o
 		  
 	  }else{ 
 		  FileNameExtensionFilter FiltrarExtencao = new FileNameExtensionFilter("Arquivos excel(*.xls)", "xls");
-		  objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenção
+		  objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenï¿½ï¿½o
 		 
 	  }
 	  
@@ -124,7 +131,7 @@ public class Arquivos extends JFrame {
 	  boolean bArquivoDuplicado = false;
 	  String sArquivo = null;
 	  //  JFileChooser chooser = new JFileChooser("/caelum/cursos/16");
-	  // SetarDir padrão: 
+	  // SetarDir padrï¿½o: 
 	  //JFileChooser(new File(System.getProperty("user.home")+File.separator+"Downloads"));	// Objeto SaveDialog
 	  
 	  JFileChooser objFileC = new JFileChooser(new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + objDef.DirDocMta));	// Objeto SaveDialog 
@@ -134,7 +141,7 @@ public class Arquivos extends JFrame {
 	  if(sExtencao == "mta"){ 
 		  	FileNameExtensionFilter FiltrarExtencao = new FileNameExtensionFilter("Arquivos mta(*.mta)", "mta");
 			objFileC.setToolTipText("Prj1.mta"); 
-		  	objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenção  
+		  	objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenï¿½ï¿½o  
 		  	//objFileC.setName("");
 		  	//objFileC.setInitialFileName("open.txt");
 		  //	objFileC.setName("Proj.mta");
@@ -143,7 +150,7 @@ public class Arquivos extends JFrame {
 		  	
 	  }else{ 
 		  FileNameExtensionFilter FiltrarExtencao = new FileNameExtensionFilter("Arquivos excel(*.csv)", "csv");
-		  objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenção
+		  objFileC.setFileFilter(FiltrarExtencao);		// Filtrar extenï¿½ï¿½o
 		//  objFileC.setName("Proj.mta");
 	  }
 	  
@@ -157,11 +164,11 @@ public class Arquivos extends JFrame {
 			  Diretorio.setText(objFileC.getCurrentDirectory().toString());
 		  }
 		  if (iValorRet == JFileChooser.CANCEL_OPTION) {
-			  NomeArq.setText("#Null");	// Se Cancelou, fixa valor de NomeArq como: "cancelado", o # é usado para testar cancelamento
+			  NomeArq.setText("#Null");	// Se Cancelou, fixa valor de NomeArq como: "cancelado", o # ï¿½ usado para testar cancelamento
 			  Diretorio.setText("");
 		  }
 		  
-		  // Formata diretório, sArquivo de retorno
+		  // Formata diretï¿½rio, sArquivo de retorno
 		  sArquivo = Diretorio.getText() + "\\" + NomeArq.getText();       
 		  
 		  return sArquivo;
@@ -173,14 +180,14 @@ public class Arquivos extends JFrame {
   
   public void SalvarCsv(JTable jtTabela){
 	  objLog.Metodo("Arquivos().Salvar()");
-	  FormatarCsv(jtTabela);	// Chama método: Formata CSV, e Grava em Arq.txt
+	  FormatarCsv(jtTabela);	// Chama mï¿½todo: Formata CSV, e Grava em Arq.txt
   }
  
   
   
   public boolean GravarTxt(String sArquivo, String sTexto){
 		
-	  // Salva texto em fArquivo, no diretório passado como caminho
+	  // Salva texto em fArquivo, no diretï¿½rio passado como caminho
 		// java.io.*;		
 	  objLog.Metodo("Arquivos().GravarTxt()");
 	
@@ -242,7 +249,7 @@ public class Arquivos extends JFrame {
 		}
 		
 
-		//caso seja um diretório, é possível listar seus arquivos e diretórios
+		//caso seja um diretï¿½rio, ï¿½ possï¿½vel listar seus arquivos e diretï¿½rios
 		//File[] arquivos = arquivo.listFiles(); 
 
 	}	
@@ -257,9 +264,9 @@ public class Arquivos extends JFrame {
 	 	try { 
 			FileReader arq = new FileReader(sNomeArq); 
 			BufferedReader lerArq = new BufferedReader(arq); 
-			String sLin = lerArq.readLine(); // lê a primeira linha // a variável "linha" recebe o valor "null" quando o processo // de repetição atingir o final do arquivo texto
+			String sLin = lerArq.readLine(); // lï¿½ a primeira linha // a variï¿½vel "linha" recebe o valor "null" quando o processo // de repetiï¿½ï¿½o atingir o final do arquivo texto
 			while (sLin != null) { 
-				vLinha[iL] = lerArq.readLine(); // lê da segunda até a última linha
+				vLinha[iL] = lerArq.readLine(); // lï¿½ da segunda atï¿½ a ï¿½ltima linha
 				objLog.Metodo("LerTxt: " + vLinha[iL]);
 				iL++;
 			} 
@@ -283,18 +290,18 @@ public class Arquivos extends JFrame {
 			String sExtencao = "csv";
 		 	String sArqExt = null;
 			Definicoes objDef = new Definicoes();
-			String sArquivo = DialogSalvar("csv", null);			// Chama Dialog-salvar, pega diretório 
+			String sArquivo = DialogSalvar("csv", null);			// Chama Dialog-salvar, pega diretï¿½rio 
 			
-			// Testa retorno de diretório: (# = Sinal de cancelar)
+			// Testa retorno de diretï¿½rio: (# = Sinal de cancelar)
 			if( sArquivo.indexOf('#') < 0){			
-				// Testa a existência de extenção	  
-				if(sArquivo.indexOf('.') > 0)	sArqExt = sArquivo;		// Sem inserção de extenção
-				else	sArqExt = sArquivo + "." + sExtencao;			// Acrescenta extenção do fArquivo
+				// Testa a existï¿½ncia de extenï¿½ï¿½o	  
+				if(sArquivo.indexOf('.') > 0)	sArqExt = sArquivo;		// Sem inserï¿½ï¿½o de extenï¿½ï¿½o
+				else	sArqExt = sArquivo + "." + sExtencao;			// Acrescenta extenï¿½ï¿½o do fArquivo
 			 
 				int iNumCol = jtTabela.getColumnCount();	// Pega num colunas Tab
 				int iNumLin = jtTabela.getRowCount();		// Pega num Linhas Tab
-				String sLinhaCSV = objDef.sTabTitulo;		// Pega títulos da tabela 
-				GravarTxt(sArqExt, sLinhaCSV);				// Salva linha(Títulos) no fArquivo	
+				String sLinhaCSV = objDef.sTabTitulo;		// Pega tï¿½tulos da tabela 
+				GravarTxt(sArqExt, sLinhaCSV);				// Salva linha(Tï¿½tulos) no fArquivo	
 				sLinhaCSV = "";								// Limpa linha(Titulos da Tab)
 				
 				objLog.Metodo("Arquivos().FormatarCsv().iNumCol: " + iNumCol +", iNumLin: " + iNumLin);
@@ -310,13 +317,13 @@ public class Arquivos extends JFrame {
 				objCxD.Aviso("Arquivo exportado para: " + sArqExt, objDef.bMsgSalvar);
 
 			}else{
-				objCxD.Aviso("Ação cancelada !", objDef.bMsgCancel);
+				objCxD.Aviso("Aï¿½ï¿½o cancelada !", objDef.bMsgCancel);
 			}
 	}
 
 	
 	/********************************************************************************/
-	/* MANIPULAÇÃO DE ARQUIVOS INI 
+	/* MANIPULAï¿½ï¿½O DE ARQUIVOS INI 
 	 *
 	 * import java.io.File;
 	 * import java.io.IOException;
@@ -338,10 +345,10 @@ public class Arquivos extends JFrame {
 			
 			try {  
 				
-				// sNomeArq entra como nome padrao PrjTeste, mas sDirArq pega digitação do usuário
-				String sDirArq = DialogSalvar("mta", sNomeArq);		// Chama SaveDialog, pega diretório				
+				// sNomeArq entra como nome padrao PrjTeste, mas sDirArq pega digitaï¿½ï¿½o do usuï¿½rio
+				String sDirArq = DialogSalvar("mta", sNomeArq);		// Chama SaveDialog, pega diretï¿½rio				
 				
-				// Ver.se nome possui extenção, caso não...insere
+				// Ver.se nome possui extenï¿½ï¿½o, caso nï¿½o...insere
 				if(!sDirArq.contains(".mta")){ sDirArq = sDirArq + ".mta";	}
 				
 				// Testa retorno de Dir(# = Sinal de cancelar)
@@ -350,7 +357,7 @@ public class Arquivos extends JFrame {
 					FixeAbreDirArq(sDirArq);		// Seta valor de Dir para info ser acessada pelo FrmPrincipal
 					String chave = "*.mta";			
 					File fArquivo = new File(sDirArq);	        
-					if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+					if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 						fArquivo.createNewFile();	//cria um arquivo(vazio)
 					}
 		        
@@ -374,7 +381,7 @@ public class Arquivos extends JFrame {
 				
 					SalvarConfig();	// Salva Dir Arq aberto em config.ini
 				}else{
-					objCxD.Aviso("Ação cancelada !", objDef.bMsgCancel);
+					objCxD.Aviso("Aï¿½ï¿½o cancelada !", objDef.bMsgCancel);
 				}
 
 		     } catch (IOException ex) {  
@@ -391,12 +398,12 @@ public class Arquivos extends JFrame {
 		//JTable jtResTab = new JTable();
 		//try{
 				
-		 // Memoriza Planilha Atual(P/ comparar alterações - nova carga de arquivo)
+		 // Memoriza Planilha Atual(P/ comparar alteraï¿½ï¿½es - nova carga de arquivo)
 		//String sMemPlanAtual = sDirArq;	
 		String chave ="*.mta";
 		
 		if(sDirArq == null){
-			sDirArq = DialogAbrir("mta");		// Chama DialogAbrir, pega diretório	
+			sDirArq = DialogAbrir("mta");		// Chama DialogAbrir, pega diretï¿½rio	
 		}
 		
 		//objLog.Metodo("Arquivos().LerMtaIni(sDirArq(openD): " + sDirArq + ")");
@@ -419,7 +426,7 @@ public class Arquivos extends JFrame {
 			
 			/*
 			 *  Testa se Planilha foi alterada... 
-			 *  verifica se novo arquivo NÃO CONTEM parte do nome(ultimos 10 char) do antigo arquivo
+			 *  verifica se novo arquivo Nï¿½O CONTEM parte do nome(ultimos 10 char) do antigo arquivo
 			 */
 			//if( !sDirArq.contains(sParteArqAntigo) ){			
 	
@@ -438,7 +445,7 @@ public class Arquivos extends JFrame {
 			//}
 	    	if(bCarregarTab){
 
-	    		// Lê total de linhas no arquivo(iL = XX)
+	    		// Lï¿½ total de linhas no arquivo(iL = XX)
 				int iNumLin = Integer.parseInt( ArqIni.get("*.mta","iL") );						
 				//-------------------------------------------------------------------
 				// Escreve dados das celulas
@@ -454,12 +461,12 @@ public class Arquivos extends JFrame {
 	    	SalvarConfig();	// Salva Dir Arq aberto em config.ini
 			//-------------------------------------------------------------------	  
 	    	
-	    	// Deveria atualizar titulo do Form mtaView mas não funciona
+	    	// Deveria atualizar titulo do Form mtaView mas nï¿½o funciona
 	    //	FrmPrincipal.setTitle(sDirArq);
 	    	
 	    	//mtaView.getFrames().getClass().getSuperclass().getTypeParameters().sTeste = sDirArq;
 	    	
-		}else{	objCxD.Aviso("Ação cancelada !", objDef.bMsgCancel);
+		}else{	objCxD.Aviso("Aï¿½ï¿½o cancelada !", objDef.bMsgCancel);
 		//	return null;
 		}
 			
@@ -479,12 +486,12 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 		//JTable jtResTab = new JTable();
 		//try{
 				
-		 // Memoriza Planilha Atual(P/ comparar alterações - nova carga de arquivo)
+		 // Memoriza Planilha Atual(P/ comparar alteraï¿½ï¿½es - nova carga de arquivo)
 		//String sMemPlanAtual = sDirArq;	
 		String chave ="*.mta";
 		
 		if(sDirArq == null){
-			sDirArq = DialogAbrir("mta");		// Chama DialogAbrir, pega diretório	
+			sDirArq = DialogAbrir("mta");		// Chama DialogAbrir, pega diretï¿½rio	
 		}
 		
 		//objLog.Metodo("Arquivos().LerMtaIni(sDirArq(openD): " + sDirArq + ")");
@@ -507,7 +514,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			
 			/*
 			 *  Testa se Planilha foi alterada... 
-			 *  verifica se novo arquivo NÃO CONTEM parte do nome(ultimos 10 char) do antigo arquivo
+			 *  verifica se novo arquivo Nï¿½O CONTEM parte do nome(ultimos 10 char) do antigo arquivo
 			 */
 			//if( !sDirArq.contains(sParteArqAntigo) ){			
 	
@@ -526,7 +533,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			//}
 	    	if(bCarregarTab){
 
-	    		// Lê total de linhas no arquivo(iL = XX)
+	    		// Lï¿½ total de linhas no arquivo(iL = XX)
 				int iNumLin = Integer.parseInt( ArqIni.get("*.mta","iL") );						
 				//-------------------------------------------------------------------
 				// Escreve dados das celulas
@@ -542,12 +549,12 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 	    	SalvarConfig();	// Salva Dir Arq aberto em config.ini
 			//-------------------------------------------------------------------	  
 	    	
-	    	// Deveria atualizar titulo do Form mtaView mas não funciona
+	    	// Deveria atualizar titulo do Form mtaView mas nï¿½o funciona
 	    //	FrmPrincipal.setTitle(sDirArq);
 	    	
 	    	//mtaView.getFrames().getClass().getSuperclass().getTypeParameters().sTeste = sDirArq;
 	    	
-		}else{	objCxD.Aviso("Ação cancelada !", objDef.bMsgCancel);
+		}else{	objCxD.Aviso("Aï¿½ï¿½o cancelada !", objDef.bMsgCancel);
 		//	return null;
 		}
 			
@@ -566,13 +573,13 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			
 			try { 
 				
-					String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretório				
+					String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretï¿½rio				
 					//String sChaveCnf = "Config";
 					//String sChavePrf = "Preferencias";
 					String sChavePrj = "Projeto";
 					
 					File fArquivo = new File(sDirArq);	        
-					if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+					if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 						fArquivo.createNewFile();	//cria um arquivo(vazio)
 					}
 		        
@@ -623,9 +630,9 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 	// Salva dados da Tabela em arquivo *.ini
 		
 		/*
-		 * Devido a diferença de objetos(Definições) 
-		 * os valore abaixo não são os mesmos, do objeto criado no mtaView
-		 * então, qdo uma var.é atualizada no objeto do mtaView(objDef.xxx), este não carrega 
+		 * Devido a diferenï¿½a de objetos(Definiï¿½ï¿½es) 
+		 * os valore abaixo nï¿½o sï¿½o os mesmos, do objeto criado no mtaView
+		 * entï¿½o, qdo uma var.ï¿½ atualizada no objeto do mtaView(objDef.xxx), este nï¿½o carrega 
 		 * o valor para o objeto(objDef.xxx) criado dentro da classe Arquivos
 		 *  
 		 */
@@ -633,10 +640,10 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 		
 		try { 
 			
-				String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretório				
+				String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretï¿½rio				
 				String chave = "Config";			
 				File fArquivo = new File(sDirArq);	        
-				if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+				if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 					fArquivo.createNewFile();	//cria um arquivo(vazio)
 				}
 	        
@@ -664,9 +671,9 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 	public void ArqLerConfig() throws IOException{
 		
 		/*
-		 * Devido a diferença de objetos(Definições) 
-		 * os valore abaixo não são os mesmos, do objeto criado no mtaView
-		 * então, qdo uma var.é atualizada no objeto do mtaView(objDef.xxx), este não carrega 
+		 * Devido a diferenï¿½a de objetos(Definiï¿½ï¿½es) 
+		 * os valore abaixo nï¿½o sï¿½o os mesmos, do objeto criado no mtaView
+		 * entï¿½o, qdo uma var.ï¿½ atualizada no objeto do mtaView(objDef.xxx), este nï¿½o carrega 
 		 * o valor para o objeto(objDef.xxx) criado dentro da classe Arquivos
 		 *  
 		 */
@@ -674,7 +681,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 		objLog.Metodo("Arquivos().ArqLerConfig()");
 
 		String sChave ="Config";
-		String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretório
+		String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretï¿½rio
 		
 			String ValorRetorno = null;
 			File fArquivo = new File(sDirArq);
@@ -682,7 +689,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			ArqIni.load(fArquivo);
 
 		
-			// Lê total de linhas no arquivo(iL = XX)
+			// Lï¿½ total de linhas no arquivo(iL = XX)
 			int iTempoTst = Integer.parseInt( ArqIni.get(sChave,"TempoTst") );						
 			int iTamTxtTelnet = Integer.parseInt( ArqIni.get(sChave,"TamTxtTelnet") );
 			boolean bZoom =  Boolean.parseBoolean( ArqIni.get(sChave,"ZoomGf") );						
@@ -704,14 +711,14 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			objLog.Metodo("Arquivos().BackupMtaIni(" + sDirArq + ")");
 			
 			try {  
-				//String sDirArq = DialogSalvar("mta", sNomeArq);		// Chama SaveDialog, pega diretório				
+				//String sDirArq = DialogSalvar("mta", sNomeArq);		// Chama SaveDialog, pega diretï¿½rio				
 				
 				// Testa retorno de Dir(# = Sinal de cancelar)
 				if( sDirArq.indexOf('#') < 0){
 
 					String chave = "*.mta";			
 					File fArquivo = new File(sDirArq);	        
-					if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+					if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 						fArquivo.createNewFile();	//cria um arquivo(vazio)
 					}
 		        
@@ -733,7 +740,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 					objLog.Metodo("mtaView().AutoBackup(Arquivo salvo em: " + sDirArq + ")");
 
 				}else{
-					objLog.Metodo("mtaView().AutoBackup(Ação cancelada !)");
+					objLog.Metodo("mtaView().AutoBackup(Aï¿½ï¿½o cancelada !)");
 				}
 
 		     } catch (IOException ex) {  
@@ -747,7 +754,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 	
 	public void criarDiretorio() {
 		/*
-		 * Testa se diretorios de mta não existem...
+		 * Testa se diretorios de mta nï¿½o existem...
 		 * Cria:
 		 * \documents\mtaView_docs\
 		 * \documents\mtaView_docs\backup\
@@ -755,16 +762,16 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 		
         try {
         	
-        	 File diretorio = new File(objDef.DirMtaDoc); // ajfilho é uma pasta!
-        	 File dirBak = new File(objDef.DirBak); // ajfilho é uma pasta!
+        	 File diretorio = new File(objDef.DirMtaDoc); // ajfilho ï¿½ uma pasta!
+        	 File dirBak = new File(objDef.DirBak); // ajfilho ï¿½ uma pasta!
              if (!diretorio.exists()) {
-                diretorio.mkdirs(); //mkdir() cria somente um diretório, mkdirs() cria diretórios e subdiretórios.
+                diretorio.mkdirs(); //mkdir() cria somente um diretï¿½rio, mkdirs() cria diretï¿½rios e subdiretï¿½rios.
                 dirBak.mkdirs();
              }
-             objLog.Metodo("Ferramentas().criarDiretorio(Diretórios criados: "+ dirBak + ")");
+             objLog.Metodo("Ferramentas().criarDiretorio(Diretï¿½rios criados: "+ dirBak + ")");
         } catch (Exception ex) {
             //JOptionPane.showMessageDialog(null, "Erro ao criar o diretorio");            
-        	objLog.Metodo("Ferramentas().criarDiretorio(Diretório já existente, "+ ex + ")");
+        	objLog.Metodo("Ferramentas().criarDiretorio(Diretï¿½rio jï¿½ existente, "+ ex + ")");
         }
         
         
@@ -773,39 +780,39 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 	
 	public void LerLicenca() throws IOException{
 		/*
-		 * O Ctrl da Licença Demo sera feito em 3 arquivos .ini
+		 * O Ctrl da Licenï¿½a Demo sera feito em 3 arquivos .ini
 		 * C:/tmp/setup.ini
 		 * /Downloads/winupdate.ini		 
 		 * /matView/config.ini
 		 * [Default]: Chave
 		 * 		...:		Cria um corpo para dar credibilidade ao arquivo - dados inuteis		 	
 		 * 		"Uservdt": 	Dta do PC, ctrl retorno de datas do PC 
-		 * 		"Uservld": 	Data de validade da licença (2018)					
+		 * 		"Uservld": 	Data de validade da licenï¿½a (2018)					
 		 */
 			
 			objLog.Metodo("Arquivos().LerLicenca()");
 			
 			String sChaveLcc = "Default";						// Registro de Licenca Demo
 			String sVarIniAnoMax = "Uservdt";					// Var-ini data ano corrente do PC
-			String sVarIniAnoPC = "Uservld";					// Var-ini data ano limite para licença
+			String sVarIniAnoPC = "Uservld";					// Var-ini data ano limite para licenï¿½a
 
 			/*
 			 * Dados de controle
-			 * Os anos são os utilizados, mas adicionei mais alguns caracteres
+			 * Os anos sï¿½o os utilizados, mas adicionei mais alguns caracteres
 			 * para dar corpo a var-ini 
 			 * Na descriptografia pego 4 ultimos apos a <tab>
 			 */
 		/*********************************************************************************/
 		// Primeira consulta: mtaView/config.ini 
 		
-			String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretório
+			String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretï¿½rio
 		
 			File fArquivo = new File(sDirArq);
 			IniEditor ArqIni = new IniEditor(true);
 			ArqIni.load(fArquivo);
 
 		
-			// Lê arquivo.ini -> Anos(encryptografados)
+			// Lï¿½ arquivo.ini -> Anos(encryptografados)
 			String sAnoPcCript = ArqIni.get(sChaveLcc, sVarIniAnoPC);						
 			String sAnoMaxCript = ArqIni.get(sChaveLcc, sVarIniAnoMax);
 
@@ -834,14 +841,14 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 		
 		
 		/*
-		 * O Ctrl da Licença Demo sera feito em 3 arquivos .ini
+		 * O Ctrl da Licenï¿½a Demo sera feito em 3 arquivos .ini
 		 * C:/tmp/setup.ini
 		 * /Downloads/winupdate.ini		 
 		 * /matView/config.ini
 		 * [Default]: Chave
 		 * 		...:		Cria um corpo para dar credibilidade ao arquivo - dados inuteis		 	
 		 * 		"Uservdt": 	Dta do PC, ctrl retorno de datas do PC 
-		 * 		"Uservld": 	Data de validade da licença (2018)					
+		 * 		"Uservld": 	Data de validade da licenï¿½a (2018)					
 		 */
 			
 			objLog.Metodo("Arquivos().SalvarLicenca()");
@@ -851,11 +858,11 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			
 			String sChaveLcc = "Default";						// Registro de Licenca Demo
 			String sVarIniAnoMax = "Uservdt";					// Var-ini data ano corrente do PC
-			String sVarIniAnoPC = "Uservld";					// Var-ini data ano limite para licença
+			String sVarIniAnoPC = "Uservld";					// Var-ini data ano limite para licenï¿½a
 
 			/*
 			 * Dados de controle
-			 * Os anos são os utilizados, mas adicionei mais alguns caracteres
+			 * Os anos sï¿½o os utilizados, mas adicionei mais alguns caracteres
 			 * para dar corpo a var-ini 
 			 * Na descriptografia pego 4 ultimos apos a <tab>
 			 */
@@ -873,10 +880,10 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 			 */
 			try { 
 				
-				String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretório
+				String sDirArq = objDef.DirRoot + "config.ini";		// Chama SaveDialog, pega diretï¿½rio
 
 				File fArquivo = new File(sDirArq);	        
-				if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+				if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 					fArquivo.createNewFile();	//cria um arquivo(vazio)
 				}
 	        
@@ -887,7 +894,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 				 * Ctrl da licenca DEmo
 				 */
 				ArqIni.addSection(sChaveLcc);					
-				ArqIni.set(sChaveLcc, sVarIniAnoPC, sAnoPcCript );		// Ultimo ano válido(efeito catraca, registra para evitar retornos de data pelo user)
+				ArqIni.set(sChaveLcc, sVarIniAnoPC, sAnoPcCript );		// Ultimo ano vï¿½lido(efeito catraca, registra para evitar retornos de data pelo user)
 				ArqIni.set(sChaveLcc, sVarIniAnoMax, sAnoMaxCript);			// Ano de validade da Licenca
 
 				ArqIni.save(fArquivo);	    	
@@ -911,7 +918,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 				
 					
 					File fArquivo = new File(objDef.Lcc1);	        
-					if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+					if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 						fArquivo.createNewFile();	//cria um arquivo(vazio)
 					}
 		        
@@ -920,7 +927,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 
 					/*
 					 * Cria uma listagens de valores sem uso, 
-					 * só pra dar uma forma mais consistente	
+					 * sï¿½ pra dar uma forma mais consistente	
 					 */
 					ArqIni.addSection(sChaveSta);							
 					ArqIni.set(sChaveSta, "AppName", "Attachmate" );		
@@ -935,7 +942,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 					 * Ctrl da licenca DEmo
 					 */
 					ArqIni.addSection(sChaveLcc);					
-					ArqIni.set(sChaveLcc, sVarIniAnoPC, sAnoPcCript );		// Ultimo ano válido(efeito catraca, registra para evitar retornos de data pelo user)
+					ArqIni.set(sChaveLcc, sVarIniAnoPC, sAnoPcCript );		// Ultimo ano vï¿½lido(efeito catraca, registra para evitar retornos de data pelo user)
 					ArqIni.set(sChaveLcc, sVarIniAnoMax, sAnoMaxCript);			// Ano de validade da Licenca
 
 					ArqIni.save(fArquivo);	    	
@@ -957,7 +964,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 				
 					
 				File fArquivo = new File(objDef.Lcc2);	        
-				if (!fArquivo.exists()) {	// Se o arquivo não existe...				
+				if (!fArquivo.exists()) {	// Se o arquivo nï¿½o existe...				
 					fArquivo.createNewFile();	//cria um arquivo(vazio)
 				}
 	        
@@ -966,7 +973,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 
 				/*
 				 * Cria uma listagens de valores sem uso, 
-				 * só pra dar uma forma mais consistente	
+				 * sï¿½ pra dar uma forma mais consistente	
 				 */
 				ArqIni.addSection(sChaveLcc);							
 				ArqIni.set(sChaveLcc, "PartnerId", "9194" );		
@@ -980,7 +987,7 @@ public void LerMtaIni_bak19nov(JTable jtTabela, String sDirArq) throws IOExcepti
 				/*
 				 * Ctrl da licenca DEmo
 				 */
-				ArqIni.set(sChaveLcc, sVarIniAnoPC, sAnoPcCript );		// Ultimo ano válido(efeito catraca, registra para evitar retornos de data pelo user)
+				ArqIni.set(sChaveLcc, sVarIniAnoPC, sAnoPcCript );		// Ultimo ano vï¿½lido(efeito catraca, registra para evitar retornos de data pelo user)
 				ArqIni.set(sChaveLcc, sVarIniAnoMax, sAnoMaxCript);			// Ano de validade da Licenca
 			
 				ArqIni.save(fArquivo);	    	

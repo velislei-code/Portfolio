@@ -1,5 +1,13 @@
 //package prjJxTrader;
-
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2016-2018
+ *   Sistemas de testes de portas ADSL em Massa 
+ *   Projeto, excecução p/ Oi S/A
+ *   All Rights Reserveds       
+ */
+ 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 

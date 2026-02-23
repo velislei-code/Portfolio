@@ -1,4 +1,14 @@
+
 // package mtaview;
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2016-2018
+ *   Sistemas de testes de portas ADSL em Massa 
+ *   Projeto, excecução p/ Oi S/A
+ *   All Rights Reserveds       
+ */
+ 
 /*
  * Bugs encontrados em 16dez2014:
  * 1 - Inicio Teste, testes em simulação, ao alterar para testes normal, 

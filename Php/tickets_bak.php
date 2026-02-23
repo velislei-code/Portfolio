@@ -2,6 +2,15 @@
 
 <?Php
 /*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2025-2026
+ *   Sistemas CTRL de Execução Tickets(Config de cctos Ip Dedicado/VPN) PHP/MySQL 
+ *   Projeto, excecução p/ ViVo S/A
+ *   All Rights Reserveds       
+ */
+ 
+/*
 CREATE TABLE etqtas (
   Registro int(11) NOT NULL auto_increment,
   ccto varchar(50) NULL,

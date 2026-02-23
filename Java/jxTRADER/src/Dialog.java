@@ -1,8 +1,15 @@
-
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2016-2018
+ *   Sistemas de testes de portas ADSL em Massa 
+ *   Projeto, excecução p/ Oi S/A
+ *   All Rights Reserveds       
+ */
 /*
  * Dialog.java
  *
- * Created on 11 June 2003, 22:54
+ * Created on 11 June 2013, 22:54
  */
 
 //package org.tigris.swidgets;

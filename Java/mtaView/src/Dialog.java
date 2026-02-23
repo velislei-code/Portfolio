@@ -2,7 +2,7 @@
 /*
  * Dialog.java
  *
- * Created on 11 June 2003, 22:54
+ * Created on 11 June 2013, 22:54
  */
 
 //package org.tigris.swidgets;

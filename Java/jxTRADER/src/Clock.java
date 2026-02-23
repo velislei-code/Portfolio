@@ -1,3 +1,13 @@
+
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2016-2018
+ *   Sistemas de testes de portas ADSL em Massa 
+ *   Projeto, excecução p/ Oi S/A
+ *   All Rights Reserveds       
+ */
+ 
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -6,7 +16,7 @@
 
 /**
  *
- * @author Soiuz
+ * @Sever Soiuz
  */
 
 

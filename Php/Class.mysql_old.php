@@ -1,6 +1,14 @@
 
 <?Php	
-
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2025-2026
+ *   Sistemas CTRL de Execução Tickets(Config de cctos Ip Dedicado/VPN) PHP/MySQL 
+ *   Projeto, excecução p/ ViVo S/A
+ *   All Rights Reserveds       
+ */
+ 
 /**
  * MySQL - Classe de manipula��o banco MySQL
  * NOTE: Requer PHP vers�o 5 ou superior

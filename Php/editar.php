@@ -1,4 +1,14 @@
 <?Php
+
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2025-2026
+ *   Sistemas CTRL de Execução Tickets(Config de cctos Ip Dedicado/VPN) PHP/MySQL 
+ *   Projeto, excecução p/ ViVo S/A
+ *   All Rights Reserveds       
+ */
+ 
 // https://www.tiktok.com/@geometryptamine/video/7062793266315431173?is_from_webapp=1&sender_device=pc&web_id=7325447832130471430	
 	
 $AttribPosAbaA = 0; //$_COOKIE['CookieAttribPosAbaA']; // Posi��o das abas "A"

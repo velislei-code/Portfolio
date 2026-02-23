@@ -1,4 +1,10 @@
-
+/* CC50-O
+ * Curso de Ciência da Computação de Harvard no Brasil
+ * by: Treuk, Velislei A
+ * 2/Ago/2024
+ * Modulo 4
+ * Program: Filter image
+ */
 
 #include <getopt.h> // optind, getopt(...)
 #include <stdio.h>
@@ -21,7 +27,7 @@ int main(int argc, char *argv[])
     // Get filter flag and check validity
     char filter = getopt(argc, argv, filters);
 
-    if(debbug) // My rotine debbug to build
+    if (debbug) // My rotine debbug to build
     {
         printf("\n<getopt.h> -> getopt(...)\n");
         printf("filter = getopt(argc, argv[], filters) return %i\n", filter);
@@ -100,7 +106,8 @@ int main(int argc, char *argv[])
 
     // Declared Struct(RGBTRIPLE) define inside file: bmp.h
     // Allocate memory for image
-    RGBTRIPLE(*image)[width] = calloc(height, width * sizeof(RGBTRIPLE));
+    RGBTRIPLE(*image)
+    [width] = calloc(height, width * sizeof(RGBTRIPLE));
     if (image == NULL)
     {
         printf("Not enough memory to store image.\n");
@@ -125,25 +132,25 @@ int main(int argc, char *argv[])
     // Filter image - aplication of filter in the image
     switch (filter)
     {
-        // Blur
-        case 'b':
-            blur(height, width, image); // <- function define inside helpers.c
-            break;
+    // Blur
+    case 'b':
+        blur(height, width, image); // <- function define inside helpers.c
+        break;
 
-        // Grayscale
-        case 'g':
-            grayscale(height, width, image); // <- function define inside helpers.c
-            break;
+    // Grayscale
+    case 'g':
+        grayscale(height, width, image); // <- function define inside helpers.c
+        break;
 
-        // Reflection
-        case 'r':
-            reflect(height, width, image); // <- function define inside helpers.c
-            break;
+    // Reflection
+    case 'r':
+        reflect(height, width, image); // <- function define inside helpers.c
+        break;
 
-        // Sepia
-        case 's':
-            sepia(height, width, image); // <- function define inside helpers.c
-            break;
+    // Sepia
+    case 's':
+        sepia(height, width, image); // <- function define inside helpers.c
+        break;
     }
 
     // Write outfile's BITMAPFILEHEADER(struct defina inside of: bmp.h)
@@ -165,24 +172,25 @@ int main(int argc, char *argv[])
         {
             fputc(0x00, outptr);
         }
-
     }
 
-        if(debbug) // My rotine debbug to build
+    if (debbug) // My rotine debbug to build
+    {
+        // Printting value of each pixel
+        for (int h = 0; h < height; h++)
         {
-           // Printting value of each pixel
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    printf("Pixel[%d][%d]: R%d, G%d, B%d\n",
-                            h, w,
-                            image[h][w].rgbtRed,
-                            image[h][w].rgbtGreen,
-                            image[h][w].rgbtBlue );
-                }
-                //printf("image[%i]: %p\n", h, image[h]);
+            for (int w = 0; w < width; w++)
+            {
+                printf("Pixel[%d][%d]: R%d, G%d, B%d\n",
+                       h, w,
+                       image[h][w].rgbtRed,
+                       image[h][w].rgbtGreen,
+                       image[h][w].rgbtBlue);
             }
-            printf("height: %i,  width: %i\n", height, width);
+            // printf("image[%i]: %p\n", h, image[h]);
         }
+        printf("height: %i,  width: %i\n", height, width);
+    }
 
     // Free memory for image
     free(image);

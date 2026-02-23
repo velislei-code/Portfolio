@@ -1,0 +1,40 @@
+ÀÄprjGarrafaH2
+   ÃÄMAIN  0/78  Ram=0
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÃÄ@delay_ms1  0/22  Ram=1
+   ³  ÃÄinicializar  0/14  Ram=0
+   ³  ÃÄAterrar  0/16  Ram=0
+   ³  ³  ÀÄ@delay_ms1  0/22  Ram=1
+   ³  ÃÄcheck_PressBtn  0/79  Ram=2
+   ³  ³  ÀÄbuzzer  0/24  Ram=2
+   ³  ³     ÃÄ@delay_ms1  0/22  Ram=1
+   ³  ³     ÀÄ@delay_ms1  0/22  Ram=1
+   ³  ÃÄStart  0/20  Ram=0
+   ³  ³  ÀÄPoloPN  0/20  Ram=0
+   ³  ³     ÀÄ@delay_ms1  0/22  Ram=1
+   ³  ÃÄStop  0/13  Ram=0
+   ³  ³  ÀÄAterrar  0/16  Ram=0
+   ³  ³     ÀÄ*
+   ³  ÀÄ@delay_ms1  0/22  Ram=1
+   ÀÄinterrupt  0/126  Ram=0
+      ÀÄClock_PIC  (Inline)  Ram=0
+         ÃÄPoloPN  0/20  Ram=0
+         ³  ÀÄ*
+         ÃÄ@delay_ms1  0/22  Ram=1
+         ÃÄPoloNP  (Inline)  Ram=0
+         ³  ÀÄ@delay_ms1  0/22  Ram=1
+         ÃÄ@delay_ms1  0/22  Ram=1
+         ÃÄ@MUL88  0/37  Ram=2
+         ÃÄbuzzer  0/24  Ram=2
+         ³  ÀÄ*
+         ÃÄStop  0/13  Ram=0
+         ³  ÀÄ*
+         ÃÄzerarClock  0/4  Ram=0
+         ÃÄ@MUL88  0/37  Ram=2
+         ÃÄStop  0/13  Ram=0
+         ³  ÀÄ*
+         ÃÄStop  0/13  Ram=0
+         ³  ÀÄ*
+         ÃÄbuzzer  0/24  Ram=2
+         ³  ÀÄ*
+         ÀÄzerarClock  0/4  Ram=0

@@ -1,0 +1,75 @@
+//#include <18f2550.h>  
+#include <16f1827.h>    
+#include <string.h>
+#use delay(crystal=4Mhz)
+#include <lcd.c>  
+
+#FUSES HS
+#FUSES NOPROTECT
+#FUSES NOPUT
+#FUSES NOWDT
+#FUSES MCLR
+
+//#USE RS232(UART1, BAUD=9600, XMIT=PIN_C6, RCV=PIN_C7, PARITY=N, STOP=1, ENABLE=PIN_B0)  //18F2550 ¨pin_RC6 = TX, pin_RC7=RX
+#USE RS232(UART1, BAUD=9600, XMIT=PIN_B1, RCV=PIN_B2, PARITY=N, STOP=1, ENABLE=PIN_B0)    //16F1827 pin_RB1=TX, pin_RB2=RX - se mudar isto(os pinos) da erro    
+
+
+// Usar portas de entradas e saídas(TXD/RXD) default
+#USE standard_io(a)
+#USE standard_io(b)
+
+//--------------------------------------------//
+// Config Pinos LCD-PIC                      // Original   
+#define LCD_ENABLE_PIN  PIN_B0               // B0                        
+#define LCD_RS_PIN      PIN_B1               // B1              
+#define LCD_RW_PIN      PIN_B2               // B2                     
+#define LCD_DATA4       PIN_B4
+#define LCD_DATA5       PIN_B5                                   
+#define LCD_DATA6       PIN_B6                                    
+#define LCD_DATA7       PIN_B7  
+
+
+void main()
+{
+   char ch;
+   
+  
+   
+   while(true)
+   {
+      lcd_init();
+      
+      getc();
+      ch=getc();
+      
+       output_high(pin_A0);
+       output_high(pin_A1);
+       output_high(pin_A2);
+       output_high(pin_A3);
+       output_high(pin_A4);
+       output_high(pin_A5);
+       output_high(pin_A6);
+      output_high(pin_A7);
+       
+      if((ch=='l')){
+         output_high(pin_B3);
+         printf("Char l recebido!\n\r");
+         
+      }else if((ch=='d')){
+         output_low(pin_B3);
+         printf("Char d recebido!\n\r");
+      }else{
+         printf("Char inválido!\n\r");
+         
+      
+      }
+   
+      lcd_gotoxy(1,1);
+      printf(LCD_PUTC,"Inciando LCD"); //muestra el conteo: %=configura la variable, 3=tres cifras, u=entera 
+      delay_ms(100); 
+   
+   }
+   
+   
+
+}

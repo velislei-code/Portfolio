@@ -1,0 +1,206 @@
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2021-2022
+ *   FVoltimetro PWM com PIC
+ *   All Rights Reserveds
+ */
+/*
+   Calculos
+      ---------------------------------------------------------
+      Divisor de tens�o
+         R1 = [ (R2 / Vo).Vi ] - R2
+         Vo = +5Vcc
+         Vi = +48Vcc
+
+         R1 ao +Vcc
+         Centro - sa�da da medi��o
+         R2 ao GND
+      ---------------------------------------------------------
+      Freq. do PWM
+
+         setup_timer_2(T2_DIV_BY_1, 255, 16);   // = 3906,3 Hz - (..,16) n�o muda
+
+         Freq = { 1[ (PR2+1).4.(1/Clock) ] } / T2_DIV_BY
+
+            PR2(1a255)
+            Clock(do osc do PIC - 4Mhz)
+            T2_DIV_BY(1, 4 ou 16)
+
+*/
+#include <main.h>
+#include <lcd.c>
+
+// #include <16F1827.h>
+// #device ADC = 10
+#fuses NOMCLR INTRC_IO
+#use delay(clock = 8000000)
+
+// #use delay (clock=4000000);
+#fuses HS, NOWDT, PUT, BROWNOUT, NOLVP
+/*
+   HS: osc a cristal
+   NOWDT: No-Watch dog
+*/
+
+// -- Decla vari�veis ---
+int16 analogico; // Var para pegar 10bits(0-1023) da entrada analogica(AN0)-leitura de tens�o de sa�da
+long memVolt;    // Armazena m�dia de 100 leituras de tens�o
+long t_Volts;    // Armazena tens�o em Volts
+
+unsigned int16 duty1 = 511; // Inicia duty no meio(0 a 1023)
+
+// --- Declara fun��es ---
+int16 Volts();
+long medias_volt();
+
+void main()
+{
+
+   // Setup PWM
+   setup_oscillator(OSC_1MHZ); // Set internal oscillator to 8MHz
+   setup_adc(ADC_CLOCK_DIV_8); // Set ADC conversion time to 8Tosc
+                               // setup_adc_ports(AN0_TO_AN1);        // Configure AN0 and AN1 as analog inputs
+   setup_adc_ports(sAN0);      // Configure AN0 as analog inputs
+
+   setup_ccp1(CCP_PWM); // Configure CCP1 as a PWM
+   // setup_ccp2(CCP_PWM);                 // Configure CCP2 as a PWM
+
+   /*
+      Temos que usar o Timer2 para configurar a frequ�ncia pwm
+      Use a seguinte equa��o para calcular a frequ�ncia pwm:
+      Per�odo PWM = [(PR2) + 1] � 4 � Tosc � (Valor de pr�-escala TMR2)
+      Onde a frequ�ncia PWM � definida como 1 / [per�odo PWM].
+      PR2 � o valor de pr�-carga do Timer2,
+      Tosc = 1 / (MCU_frequency) O valor de pr�-escala TMR2
+      pode ser 1, 4 ou 16.
+
+      PWM = (PR2+1).4.(1/CLOCK) -> Clock $Mhz, depende da config no Proj.Wizard
+      Freq = 1/PWM
+
+      PWM = (250+1).4.(1/4.000.000)
+      PWM = 1004.0,000.000.25
+      PWM = 0,000.251
+
+      Freq = 1/PWM
+      Freq = 1/0,000.251
+      Freq = 3.984hz
+
+      Osc(hz) = Freq / BY_X
+      Osc(hz) = 3984/16
+      Osc(hz) = 249hz
+
+      BY_1, 4 ou 16, 1a255, 16
+      setup_timer_2(T2_DIV_BY_1, 255, 16);    = 4khz      (16x250=4000 -> 4khz/By_1 = 4khz)
+      setup_timer_2(T2_DIV_BY_4, 250, 16);   = 1khz      (16x250=4000 -> 4khz/By_4 = 1khz)
+      setup_timer_2(T2_DIV_BY_16, 250, 16);   = 250hz    (16x250=4000 -> 4khz/By_16 = 250hz)
+    */
+
+   setup_timer_2(T2_DIV_BY_1, 255, 16); // Set PWM frequency to 244Hz -
+   delay_ms(10);                        // Wait 100ms
+
+   setup_adc_ports(sAN1); // Config porta AN1(analogica) leitura de tens�o
+   setup_adc(ADC_CLOCK_INTERNAL);
+
+   lcd_init();
+
+   printf(lcd_putc, "\f Voltimetro PIC"); // imprimir no lcd (\f limpa o lcd)
+   delay_ms(50);                          // atualiza��o de tela a cada X ms
+
+   while (TRUE)
+   {
+
+      int16 tensao = Volts();
+
+      // PWM
+      set_adc_channel(0); // Select channel AN0
+      delay_ms(10);       // Wait 1ms
+
+      // Leitura da porta analogica - Tens�o de sa�da
+      set_adc_channel(1); // Config entrada analogica 1 que sera lida(entrada 0 esta potenciometro ajuste largura de pulso PWM)
+      delay_us(10);       // tempo para sele��o
+
+      // Le potenciometro ajustavel
+      // duty1 = read_adc();                   // Read from AN0 and store in i - AN0 varia de 0 a 1023
+
+      delay_ms(10);         // Wait 1ms
+      set_pwm1_duty(duty1); // Set pwm1 duty cycle to i
+      delay_ms(10);         // Wait 1ms
+
+      char msg[10] = "";
+
+      // Alto ajuste Duty(largura de pulso) cfe tens�o de saida(12V)
+      if (tensao == 12 || tensao == 13 || tensao == 14)
+      {
+         msg = "---";
+      }
+      else if (tensao < 12 || tensao > 14)
+      {
+
+         if (tensao > 14)
+         {
+            duty1 -= 10;
+            msg = "Dn";
+         }
+         if (tensao < 12)
+         {
+            duty1 += 10;
+            msg = "Up";
+         }
+      }
+
+      // printf(lcd_putc,"\f %s Vcc \n\r",msg);
+      //      delay_ms(500);
+
+      // Limites
+      if (duty1 <= 20)
+         duty1 = 10;
+      if (duty1 >= 1000)
+         duty1 = 1000;
+
+      // set_adc_channel(1);                  // Select channel AN1
+      // delay_ms(1);                         // Wait 1ms
+      //  j = read_adc();                      // Read from AN1 and store in j
+      // set_pwm1_duty(i);                    // Set pwm1 duty cycle to i
+      //  set_pwm2_duty(j);                    // Set pwm2 duty cycle to j - n�o uso porta 2
+      // delay_ms(1);                         // Wait 1ms
+
+      // analogico = read_adc();     // leitura da entrada analogica
+      //  printf("\r\n %lu Vcc \n\r Duty %lu",volts(),duty1);
+
+      printf(lcd_putc, "\f %lu Vcc \n\r %lu(Duty) %s", tensao, duty1, msg); // L� a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd)
+      delay_ms(50);
+   }
+}
+
+int16 volts()
+{
+
+   memVolt = medias_volt();               // Recebe o valor m�dio da tens�o retornando pela fun��o average_volt
+                                          // memVolt = read_adc();                    // leitura da entrada analogica
+   int16 t_Volts = (memVolt * 48) / 1023; // 400 = 40.0 Volt(tens�o m�x, com 1 decimal) - Converte valor para Volts(1023 Resolu��o de 10 bits do conversor AD)
+
+   /* caso se tenha um Volt�metro at� 60V:
+    * Reprojetar o divisor de tens�o p/ 60V
+    * Alterar calc para:
+    * t_Volts = (store*600)/1023;
+    */
+
+   return (t_Volts);
+}
+
+long medias_volt()
+{                          // Fun��o que calcula a m�dia de 100 leituras de tens�o
+                           // garante maior precis�o na medida, se houver alma leitura erronea por ru�dos, ele vai corrigir pois retorna a m�dia(100) das leituras
+   unsigned char i;        // Var de itera��es
+   long volt_armazena = 0; // var local p/ armazenar o valor de tens�o
+
+   for (i = 0; i < 100; i++)
+   { // Soma as 100 leituras
+      // volt_armazena += ADC_Read(0);    // Temp_store = temp_store + ADC_Read(0) (Faz soma das 100 leitiras)
+      volt_armazena += read_adc(); // leitura da entrada analogica
+   }
+
+   return (volt_armazena / 100); // Retorna a media das itera��es
+
+} // end average_temp

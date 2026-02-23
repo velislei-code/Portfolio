@@ -1,0 +1,67 @@
+
+/*
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2021-2022
+ *   PWM com PIC
+ *   All Rights Reserveds
+ */
+
+#include <main.h>
+
+#include <lcd.c>
+
+void main()
+{
+  short current_duty_1 = 0; // valor inicial para current_duty_1
+  short current_duty_2 = 0; // valor inicial para current_duty_2
+
+  // TRISD = 0xFF; // PORTD como entrada
+  // TRISC = 0x00; // PORTC como sa�da
+
+  // #USE PWM(OUTPUT=PIN_C2, FREQUENCY=10kHz, DUTY=25)
+
+  pwm_set_duty_percent(500); // set PWM duty cycle to 50%
+
+  PWM1_Init();     // Inicializar PWM1
+  PWM2_Init(5000); // Inicializar PWM2
+
+  PWM1_Start(); // inicia PWM1
+  PWM2_Start(); // inicia PWM2
+
+  PWM1_Set_Duty(current_duty_1); // Define o servi�o atual para PWM1
+  PWM2_Set_Duty(current_duty_2); // Define o servi�o atual para PWM2
+
+  while (1) // loop infinito
+  {
+    if (!RD0_bit) // bot�o if em RD0 pressionado
+    {
+      Delay_ms(40);
+      current_duty_1++;              // incrementar current_duty_1
+      PWM1_Set_Duty(current_duty_1); // Alterar o ciclo de trabalho
+    }
+
+    if (!RD1_bit) // bot�o em RD1 pressionado
+    {
+      Delay_ms(40);
+      current_duty_1--; // decrementar current_duty_1
+      PWM1_Set_Duty(current_duty_1);
+    }
+
+    if (!RD2_bit) // bot�o if em RD2 pressionado
+    {
+      Delay_ms(40);
+      current_duty_2++; // incrementar current_duty_2
+      PWM2_Set_Duty(current_duty_2);
+    }
+
+    if (!RD3_bit) // bot�o if no RD3 pressionado
+    {
+      Delay_ms(40);
+      current_duty_2--; // decrementar current_duty_2
+      PWM2_Set_Duty(current_duty_2);
+    }
+
+    Delay_ms(10); // diminua um pouco o ritmo de mudan�a
+  }
+}

@@ -1,0 +1,132 @@
+004-005 @WRITE_PACKED_MEMORY.P1
+004-005 @WRITE_PROGRAM_MEMORY8.P2
+004-005 @READ_PROGRAM_MEMORY8.P3
+004-005 @READ_PACKED_MEMORY.P4
+006-007 @WRITE_PACKED_MEMORY.P1
+006-007 @READ_PACKED_MEMORY.P2
+00D     lcdlat
+00D     lcd
+020-021 analogico
+022-023 Volts.t_Volts
+022     lcd_init.i
+022     MAIN.@SCRATCH1
+022     @PSTRINGC7_669.@SCRATCH1
+023     lcd_init.@SCRATCH1
+023     MAIN.@SCRATCH2
+023     @PSTRINGC7_669.@SCRATCH2
+024     @PSTRINGCN7_669.P1
+024-025 @MUL1616.P2
+024-025 @PRINTF_LU_669.P3
+024     @PSTRINGC7_669.@SCRATCH3
+024     Volts.@SCRATCH1
+025     @PSTRINGC7_669.@SCRATCH4
+025     @PSTRINGCN7_669.@SCRATCH1
+025     Volts.@SCRATCH2
+026-027 @MUL1616.P1
+026-027 @DIV1616.P2
+026     @PRINTF_LU_669.@SCRATCH1
+026     @PSTRINGCN7_669.@SCRATCH2
+027     @PRINTF_LU_669.@SCRATCH2
+027     @PSTRINGCN7_669.@SCRATCH3
+028-029 @DIV1616.P1
+028     @PRINTF_LU_669.@SCRATCH3
+028     @PSTRINGCN7_669.@SCRATCH4
+028     @MUL1616.@SCRATCH1
+029     @PRINTF_LU_669.@SCRATCH4
+02A     @PRINTF_LU_669.@SCRATCH5
+02A     @DIV1616.@SCRATCH1
+02B     @PRINTF_LU_669.@SCRATCH6
+02C     @PRINTF_LU_669.@SCRATCH7
+02D     lcd_putc.c
+02E     lcd_gotoxy.x
+02E     @delay_ms1.P1
+02F     lcd_gotoxy.y
+030     lcd_gotoxy.address
+031     lcd_gotoxy.@SCRATCH1
+032     lcd_send_byte.address
+033     lcd_send_byte.n
+034     lcd_read_byte.low
+034     lcd_send_byte.@SCRATCH1
+035     lcd_send_nibble.n
+035     lcd_read_byte.high
+036     lcd_read_byte.@SCRATCH1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+08D     lcdtris
+111.6   C1OUT
+113.6   C2OUT
+191-192 @WRITE_PROGRAM_MEMORY8.P1
+191-192 @READ_PROGRAM_MEMORY8.P2
+291     CCP_1
+291     CCP_1_LOW
+292     CCP_1_HIGH
+298     CCP_2_LOW
+298     CCP_2
+299     CCP_2_HIGH
+311     CCP_3
+311     CCP_3_LOW
+312     CCP_3_HIGH
+318     CCP_4_LOW
+318     CCP_4
+319     CCP_4_HIGH
+
+ROM Allocation:
+000003  LCD_INIT_STRING.call
+000004  LCD_INIT_STRING.data
+000008  @const686.call
+000011  @const688.call
+000019  @delay_ms1
+00002F  lcd_send_nibble
+00003B  lcd_read_nibble
+000041  lcd_send_byte
+000047  lcd_read_byte
+000081  lcd_init
+0000B3  lcd_gotoxy
+0000C5  lcd_putc
+0000F1  @PSTRINGC7_669
+000137  Volts
+00014D  @MUL1616
+00016D  @DIV1616
+00019B  @PRINTF_LU_669
+0001FA  @PSTRINGCN7_669
+000248  MAIN
+000248  @cinit1
+000254  @cinit2
+
+Project Directory:
+    C:\Users\oi298979\Documents\Proteus\Le_An0_lcd\software\
+
+Project Files:
+    main.c                                                  [05-set-21 18:27  CRC=1ADCC3B1]
+    main.h                                                  [05-set-21 18:01  CRC=B723CC71]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F1827.h [03-jul-13 14:28  CRC=CC443070]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Drivers\lcd.c [23-ago-12 09:01  CRC=D28E8746]
+
+Source signature=4361CF1E
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC16F1827
+    Pointer Size:   16
+    ADC Range:      0-1023
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Enhanced 16:    Yes
+
+Output Files:
+    XREF file:   main.xsym
+    Errors:      main.err
+    Ext Symbols: main.esym
+    INHX8:       main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA

@@ -1,0 +1,942 @@
+
+// by: Treuk, Velislei A
+//   email: velislei@gmail.com
+//   Copyright(c) 2010-2011
+//   Sistemas de Monitoramento e bloqueio de fraudes em portas ADSL em Massa 
+//   Projeto, excecução p/ Oi S/A
+//   All Rights Reserveds       
+
+ 
+unit UnMain;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Menus, ToolWin, ComCtrls, StdCtrls, Buttons, ExtCtrls, jpeg, DBCtrls,
+  Grids, DBGrids, Db, ZAbstractRODataset, ZAbstractDataset, ZAbstractTable,
+  ZDataset, ZConnection, OleCtrls, CHILKATSSHLib_TLB, Mask;
+
+type
+  TMain = class(TForm)
+    ToolBar1: TToolBar;
+    MainMenu1: TMainMenu;
+    Arquivo1: TMenuItem;
+    Abrir1: TMenuItem;
+    Novo1: TMenuItem;
+    N1: TMenuItem;
+    Sair1: TMenuItem;
+    MenuSistema: TMenuItem;
+    MenuConectar: TMenuItem;
+    Info1: TMenuItem;
+    Sobre1: TMenuItem;
+    N2: TMenuItem;
+    Sobre2: TMenuItem;
+    BtIdaeia: TSpeedButton;
+    BtPlaneta: TSpeedButton;
+    BtTools: TSpeedButton;
+    N3: TMenuItem;
+    MenuComandos1: TMenuItem;
+    MenuResultado1: TMenuItem;
+    MenuShell1: TMenuItem;
+    ZCon: TZConnection;
+    ZTbPtHuawei: TZTable;
+    DsPtHuawei: TDataSource;
+    ZTbDslamHuawei: TZTable;
+    DsDslamHuawei: TDataSource;
+    MenuRastrear2: TMenuItem;
+    MenuRepositorio2: TMenuItem;
+    PnConectar: TPanel;
+    PgCtrlDslam: TPageControl;
+    TSDslam: TTabSheet;
+    GBShell: TGroupBox;
+    GBRastrear: TGroupBox;
+    GBComandos: TGroupBox;
+    GBResultado: TGroupBox;
+    GBMySql: TGroupBox;
+    DbGTbPortas: TDBGrid;
+    DbGTbDslam: TDBGrid;
+    DbNTbPortas: TDBNavigator;
+    DbNTbDslam: TDBNavigator;
+    GBRepositorio: TGroupBox;
+    DbEdStatus: TDBEdit;
+    DdEdVelUP: TDBEdit;
+    DbEdVelDN: TDBEdit;
+    DbEdDslam_Reg: TDBEdit;
+    DbEdDslamID: TDBEdit;
+    DbEdDslamVersao: TDBEdit;
+    DbEdDslamPlacas: TDBEdit;
+    MemoShell: TMemo;
+    MemoComandos: TMemo;
+    MemoResultado: TMemo;
+    MemoRastrear: TMemo;
+    PnBotoes: TPanel;
+    BtScan: TBitBtn;
+    Image1: TImage;
+    Bevel1: TBevel;
+    BtSair: TBitBtn;
+    procedure MenuConectarClick(Sender: TObject);
+    procedure Sair1Click(Sender: TObject);
+    procedure BitBtn2Click(Sender: TObject);
+    procedure MenuComandos1Click(Sender: TObject);
+    procedure MenuRastrear2Click(Sender: TObject);
+    procedure MenuResultado1Click(Sender: TObject);
+    procedure MenuShell1Click(Sender: TObject);
+    procedure BtScanearClick(Sender: TObject);
+    procedure MenuRepositorio2Click(Sender: TObject);
+    procedure Sobre2Click(Sender: TObject);
+    procedure BtScanClick(Sender: TObject);
+    procedure BtSairClick(Sender: TObject);
+  private
+    { Private declarations }
+    function Main: Boolean;
+    function Conectar(hostname: String; port: Integer; login, senha: String): Boolean;
+    function Scanear: Boolean;
+    function Desconectar: Boolean;
+    function Rastrear(funcao: String): Boolean;
+    function Huawei5100(ID_Dslam: String; num_placas: Integer): boolean;
+    function Huawei5103(ID_Dslam: String; num_placas: Integer): boolean;
+    function Huawei5600(ID_Dslam: String; num_placas: Integer): boolean;
+    function Script(comando, prompt: String): Boolean;   
+    function ShVersion: string;
+    function ShState(Versao: String): string;
+    function EditarMySql(Porta, Status, Profile, VelUP, VelDN: String): boolean;
+
+    procedure Profile5100(var Profile, Up, Dn: String);
+    procedure Profile5103(var Profile, Up, Dn: String);    
+    procedure Profile5600(var Profile, Up, Dn: String);
+
+  public
+    { Public declarations }
+  end;
+
+var
+  Main: TMain;
+  ssh: TChilkatSsh;
+  success: Integer;
+  channelNum: Integer;
+  resposta: string;    // Recebe o retorno de show port state X
+  Teste_num_portas: Integer;    // Num de portas a testar
+  prompt_anterior: String;
+
+
+implementation
+
+uses DgSobre;
+
+{$R *.DFM}
+
+procedure TMain.MenuConectarClick(Sender: TObject);
+begin
+        if MenuConectar.Checked then
+        begin
+            MenuConectar.Checked := false;
+            PnConectar.visible := false;
+        end else begin
+            MenuConectar.Checked := true;
+            PnConectar.visible := true;
+        end;
+end;
+
+procedure TMain.Sair1Click(Sender: TObject);
+begin
+        application.terminate;
+end;
+
+procedure TMain.BitBtn2Click(Sender: TObject);
+begin
+        application.terminate;
+end;
+
+procedure TMain.MenuComandos1Click(Sender: TObject);
+begin
+        if MenuComandos1.Checked then
+        begin
+           MenuComandos1.Checked := false;
+           GBComandos.Visible := false;
+        end else begin
+           MenuComandos1.Checked := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+           GBComandos.Visible := true;
+        end;
+end;
+
+procedure TMain.MenuRastrear2Click(Sender: TObject);
+begin
+        if MenuRastrear2.Checked then
+        begin
+           MenuRastrear2.Checked := false;
+           GBRastrear.Visible := false;
+        end else begin
+           MenuRastrear2.Checked := true;
+           GBRastrear.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+
+end;
+
+procedure TMain.MenuResultado1Click(Sender: TObject);
+begin
+        if MenuResultado1.Checked then
+        begin
+           MenuResultado1.Checked := false;
+           GBResultado.Visible := false;
+        end else begin
+           MenuResultado1.Checked := true;
+           GBResultado.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+
+end;
+
+procedure TMain.MenuShell1Click(Sender: TObject);
+begin
+        if MenuShell1.Checked then
+        begin
+           MenuShell1.Checked := false;
+           GBShell.Visible := false;
+        end else begin
+           MenuShell1.Checked := true;
+           GBShell.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+end;
+
+
+//******************************************************************************
+// Funções
+
+function TMain.Main: Boolean;
+begin
+        if MenuRastrear2.Checked then Rastrear('Main()');
+
+        Teste_num_portas := 3;                                                  // Limita num de portas por placas
+
+	if (Conectar('10.142.184.114',22,'tr109065','asw21qaz')) then           // Inicia conexão com Servidor
+        Scanear();                     			                        // Inicia varredura das portas
+        Desconectar();
+end;
+
+function TMain.Rastrear(funcao: String): Boolean;
+begin
+	MemoRastrear.Lines.Add(funcao);
+end;
+
+function TMain.Conectar(hostname: String; port: Integer; login, senha: String): Boolean;
+var
+   termType: String;
+   widthInChars: Integer;
+   heightInChars: Integer;
+   pixWidth: Integer;
+   pixHeight: Integer;
+   resultado: boolean;
+
+begin
+
+    if MenuRastrear2.Checked then Rastrear('Conectar()');
+
+    resultado := true;						// Inicialmente considera conexão como OK
+
+// Importante: É útil para enviar o conteúdo do
+// Propriedade ssh.LastErrorText / ao solicitar apoio.
+
+ssh := TChilkatSsh.Create(Self);
+
+
+// Qualquer string começa automaticamente a um julgamento totalmente funcional por 30 dias.
+success := ssh.UnlockComponent('30-day trial');
+if (success <> 1) then
+begin
+    MemoShell.Lines.Add('ERRO 1001 ! [UnlockComponent] ');
+    // ShowMessage(ssh.LastErrorText);
+    resultado := false;
+    Exit;
+end;
+
+// Mantenha um registro de sessão, que está disponível através do SessionLog
+// Propriedade:
+ssh.KeepSessionLog := 1;
+
+MemoShell.Lines.Add('Iniciando conexão...');
+success := ssh.Connect(hostname,port);
+if (success <> 1) then
+begin
+    MemoShell.Lines.Add('ERRO 1002 ! [Connect]');
+    // MemoShell.Lines.Add(ssh.LastErrorText);
+//    MemoShell.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+
+// Ao ler, se não houver dados adicionais chega a mais de
+// 5 segundos, então abortar:
+ssh.IdleTimeoutMs := 5000;
+
+// Autenticação de Servidor SSH
+// Se não houver um login / password necessário, você ainda deve chamar
+// AuthenticatePw e usar quaisquer valores para login / password.
+success := ssh.AuthenticatePw(login,senha);
+if (success <> 1) then
+  begin
+    // MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add('ERRO 1003 ! [AuthenticatePw]');
+//    MemoShell.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+
+// Abrir um canal de sessão.
+channelNum := ssh.OpenSessionChannel();
+if (channelNum < 0) then
+  begin
+//    MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add('ERRO 1004! [OpenSessionChannel]');
+//    MemoShell.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+
+// Pedir uma pseudo-terminal
+termType := 'dumb';
+widthInChars := 120;
+heightInChars := 40;
+pixWidth := 0;
+pixHeight := 0;
+success := ssh.SendReqPty(channelNum,termType,widthInChars,heightInChars,pixWidth,pixHeight);
+if (success <> 1) then
+  begin
+    // MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add('ERRO 1005 ! [SendReqPty]');
+//    MemoShell.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end ;
+
+
+// Iniciar uma shell no canal:
+success := ssh.SendReqShell(channelNum);
+if (success <> 1) then
+  begin
+    // MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add('ERRO 1006 ! [SendReqShell]');
+//    MemoShell.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+        result := resultado;
+
+end; // final função Acessar
+
+function TMain.Scanear: Boolean;
+var
+	TD, Total_Dslam, Num_Placas: Integer;
+	Nome_Dslam, Versao_Dslam: String;
+
+begin
+//********************************************************************************************
+// Inicia varredura
+
+		 if MenuRastrear2.Checked then Rastrear('Scanear()');
+
+        ZTbDslamHuawei.last;                             // Aponta para o ultimo registro
+        Total_Dslam := StrToInt(DbEdDslam_Reg.Text);    // Pega total de Dslam´s na tabela
+        for TD := 1 to Total_Dslam do
+        begin
+             ZTbDslamHuawei.Locate('registro',TD,[]);          // Aponta para registro correspondente
+             Nome_Dslam := (DbEdDslamID.text);               // Pega ID do dslam
+             Num_Placas :=  StrToInt(DbEdDslamPlacas.text);  // Pega Total de placas
+             Versao_Dslam := DbEdDslamVersao.text;                // Pega Versao
+
+
+//             if (Versao_Dslam = '5100') then MemoComunica.Lines.Add('Teste ! Conexão com: ' + IntToStr(TD) + '=' + Nome_Dslam + '-' + Versao_Dslam + '-' + IntToStr(Num_Placas) );
+//             if (Versao_Dslam = '5100') then Huawei5100(Nome_Dslam,Num_Placas);  // Executa acesso ao Huawei 5100
+
+//             if (Versao_Dslam = '5103') then MemoComunica.Lines.Add('Teste ! Conexão com: ' + IntToStr(TD) + '=' + Nome_Dslam + '-' + Versao_Dslam + '-' + IntToStr(Num_Placas) ); // Huawei5103(Nome_Dslam,Num_Placas);  // Executa acesso ao Huawei 5103
+             if (Versao_Dslam = '5103') then Huawei5103(Nome_Dslam,Num_Placas);  // Executa acesso ao Huawei 5600
+
+//             if (Versao_Dslam = '5100') then MemoComunica.Lines.Add('Teste ! Conexão com: ' + IntToStr(TD) + '=' + Nome_Dslam + '-' + Versao_Dslam + '-' + IntToStr(Num_Placas) );
+//             if (Versao_Dslam = '5600') then Huawei5600(Nome_Dslam,Num_Placas);  // Executa acesso ao Huawei 5600
+
+        end;
+//********************************************************************************************
+end;   // Final da função Scanear
+
+function TMain.Desconectar: Boolean;
+begin
+
+ if MenuRastrear2.Checked then Rastrear('Desconectar()');
+ 
+// Envia um comando. Neste caso, estamos enviando o "exit" comando:
+success := ssh.ChannelSendString(channelNum,'exit' + #13,'ansi');
+if (success <> 1) then
+  begin
+    MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add(ssh.SessionLog);
+    Exit;
+  end;
+
+
+// Você pode continuar a enviar comandos adicionais.
+// A técnica é: enviar o comando, leia até o próximo comando prompt,
+// E depois buscar / limpar o buffer de recepção interna.
+
+// Nós somos feitos, então desligá-lo ..
+
+// Enviar um EOF. Isso informa ao servidor que mais nenhum dado será
+// Ser enviadas neste canal. O canal permanece aberto e
+// O cliente SSH pode ainda receber saída neste canal.
+success := ssh.ChannelSendEof(channelNum);
+if (success <> 1) then
+  begin
+    MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add(ssh.SessionLog);
+    Exit;
+  end;
+
+
+//  Fechar canal:
+success := ssh.ChannelSendClose(channelNum);
+if (success <> 1) then
+  begin
+    MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add(ssh.SessionLog);
+    Exit;
+  end;
+
+//  Disconnect
+ ssh.Disconnect();
+
+
+   result := true;
+end;  // Final função Desconectar
+
+function TMain.Huawei5100(ID_Dslam: String; num_placas: Integer): boolean;
+var
+   slot_adsl, porta_adsl: Integer;
+   cmd_slot, prompt_slot, cmd_porta, prompt_porta: String;
+   slotAD, portaAD, ID_Porta: String;
+   Profile, Up, Dn : String;
+
+begin
+	 if MenuRastrear2.Checked then Rastrear('Huawei5100()');
+	 
+    //******************************************************************************
+// Script´s
+
+        Script('telnet ' + ID_Dslam,'>>User name:');   // This user has logined!
+        MemoResultado.Lines.Add(ShVersion());           // Imprime versão do eqpto
+
+        Script('root','>>User password:');
+        Script('admin',ID_Dslam + '>');
+        Script('enable',ID_Dslam + '#');
+        Script('conf ter',ID_Dslam + '(config)#');
+        Script('no alarm output all',ID_Dslam + '(config)#');
+
+
+        //Entra no slot
+        for slot_adsl:=0 to num_placas do
+        begin
+        if (slot_adsl <> 7)and(slot_adsl <> 8) then begin   // Saltar placas 7 e 8 (MMX)
+
+          cmd_slot := 'int adsl 0/' + IntToStr(slot_adsl);                              // Comando
+          prompt_slot := ID_Dslam + '(config-if-adsl-0/' + IntToStr(slot_adsl) + ')#';      // Retorno
+          Script(cmd_slot,prompt_slot);                                                 // Script a enviar
+          //********************************************************************************
+          // Consulta a porta dentro do slot
+          for porta_adsl:=0 to Teste_num_portas do
+          begin
+
+                cmd_porta := 'show port state ' + IntToStr(porta_adsl);                 // Comando a enviar
+                prompt_porta := ID_Dslam + '(config-if-adsl-0' + '/' + IntToStr(slot_adsl) + ')#'; // Retorno a receber
+
+
+                // Formatação de slot e porta para comparar com BD_MySql
+                if slot_adsl < 10 then slotAD := '0' + IntToStr(slot_adsl)
+                else slotAD := IntToStr(slot_adsl);
+                if porta_adsl < 10 then portaAD := '0' + IntToStr(porta_adsl)
+                else portaAD := IntToStr(porta_adsl);
+                ID_Porta := ID_Dslam + '-' + slotAD + '/' + portaAD;
+
+                // Mostra comandos enviados
+                MemoComandos.Lines.add(prompt_porta + ' ' + cmd_porta);
+
+                // Script(x,Y): envia comando X, recebe prompt Y da porta;
+                Script(cmd_porta,prompt_porta);
+
+                Profile5100(Profile,Up,Dn);                         // Analisa Vel Up-Down
+                EditarMySql(ID_Porta,ShState('MA5100'),Profile,Up,Dn);      // Atualizar registros no BD MySql
+
+                // Mostrar relatorio da consulta
+                // State(): verifica se Inativa, Ativa ou bloqueada
+                // Profile(): Analiza a velocidade da Porta
+                MemoResultado.Lines.Add('[' + ID_Porta + ']' + ' - ' + ShState('MA5100') + ' - ' + Up + '-' + Dn );
+
+          end;  // for porta_adsl
+           //********************************************************************************
+          Script('exit',ID_Dslam + '#');
+         end;  // if... salta 7 e 8
+         end; // for slot_adsl
+
+        //********************************************************************************
+        Script('end',ID_Dslam + '#');
+        Script('exit','System data has changed. Please save data before logout. Are you sure to log  out? (y/n)[n]:');
+
+        Script('y','bash-2.03$');
+
+
+   result := true;
+
+end;   // Final da função 5100
+
+function TMain.Huawei5103(ID_Dslam: String; num_placas: Integer): boolean;
+var
+   slot_adsl, porta_adsl: Integer;
+   cmd_slot, prompt_slot, cmd_porta, prompt_porta: String;
+   slotAD, portaAD, ID_Porta: String;
+   Profile, Up, Dn : String;
+
+begin
+	 if MenuRastrear2.Checked then Rastrear('Huawei5103()');
+      		
+//******************************************************************************
+// Script´s MA5103
+        Script('telnet ' + ID_Dslam,' Huawei MA5103 Multi-service Access Module. Copyright(C) 1998-2002 by Huawei Technologies Co., Ltd.> User name (<20 chars):');
+        Script('root','> Password (<20 chars):');
+        Script('admin',ID_Dslam + '>');
+        Script('enable',ID_Dslam + '#');
+        Script('conf ter',ID_Dslam + '(config)#');
+        
+
+        //Entra no slot
+        for slot_adsl:=4 to 6 do
+        begin
+          cmd_slot := 'int adsl 0/' + IntToStr(slot_adsl);                              // Comando
+          prompt_slot := ID_Dslam + '(config-ADSL-0/' + IntToStr(slot_adsl) + ')#';      // Retorno
+          Script(cmd_slot,prompt_slot);                                                 // Script a enviar
+          //********************************************************************************
+          // Consulta a porta dentro do slot
+          for porta_adsl:=0 to Teste_num_portas do
+          begin
+
+                cmd_porta := 'show line oper ' + IntToStr(porta_adsl);                 // Comando a enviar
+                prompt_porta := ID_Dslam + '(config-ADSL-0/' + IntToStr(slot_adsl) + ')#'; // Retorno a receber
+
+
+                // Formatação de slot e porta para comparar com BD_MySql
+                if slot_adsl < 10 then slotAD := '0' + IntToStr(slot_adsl)
+                else slotAD := IntToStr(slot_adsl);
+                if porta_adsl < 10 then portaAD := '0' + IntToStr(porta_adsl)
+                else portaAD := IntToStr(porta_adsl);
+                ID_Porta := ID_Dslam + '-' + slotAD + '/' + portaAD;
+
+                // Mostra comandos enviados
+                MemoComandos.Lines.add(prompt_porta + ' ' + cmd_porta);
+
+                // Script(x,Y): envia comando X, recebe prompt Y da porta;
+                Script(cmd_porta,prompt_porta);
+
+                Profile5103(Profile,Up,Dn);                         // Analisa Vel Up-Down
+                EditarMySql(ID_Porta,ShState('MA5103'),Profile,Up,Dn);      // Atualizar registros no BD MySql
+
+                // Mostrar relatorio da consulta
+                // State(): verifica se Inativa, Ativa ou bloqueada
+                // Profile(): Analiza a velocidade da Porta
+                MemoResultado.Lines.Add('[' + ID_Porta + ']' + ' - ' + ShState('MA5103') + ' - ' + Up + '-' + Dn );
+
+          end;  // for porta_adsl
+           //********************************************************************************
+          Script('exit',ID_Dslam + '(config)#');
+         end; // for slot_adsl
+
+        Script('end',ID_Dslam + '#');
+        Script('exit',ID_Dslam + '>');
+        Script('exit','bash-2.03$');
+
+
+   result := true;
+
+end;
+
+function TMain.Huawei5600(ID_Dslam: String; num_placas: Integer): boolean;
+var
+   slot_adsl, porta_adsl: Integer;
+   cmd_slot, prompt_slot, cmd_porta, prompt_porta: String;
+   slotAD, portaAD, ID_Porta: String;
+   Profile, Up, Dn : String;
+
+begin
+	 if MenuRastrear2.Checked then Rastrear('Huawei5600()');
+
+//******************************************************************************
+// Script´s
+
+        Script('telnet ' + ID_Dslam,'>>User name:');   // This user has logined!
+        MemoResultado.Lines.Add(ShVersion());           // Imprime versão do eqpto
+
+        Script('root','>>User password:');
+        Script('admin',ID_Dslam + '>');
+        Script('enable',ID_Dslam + '#');
+        Script('conf',ID_Dslam + '(config)#');
+        Script('undo alarm output all',ID_Dslam + '(config)#');
+
+
+        //Entra no slot
+        for slot_adsl:=0 to num_placas do
+        begin
+        if (slot_adsl <> 7)and(slot_adsl <> 8) then begin   // Saltar placas 7 e 8 (MMX)
+
+          cmd_slot := 'int adsl 0/' + IntToStr(slot_adsl);                              // Comando
+          prompt_slot := ID_Dslam + '(config-if-adsl-0/' + IntToStr(slot_adsl) + ')#';      // Retorno
+          Script(cmd_slot,prompt_slot);                                                 // Script a enviar
+          //********************************************************************************
+          // Consulta a porta dentro do slot
+          for porta_adsl:=0 to Teste_num_portas do
+          begin
+
+                cmd_porta := 'display port state ' + IntToStr(porta_adsl);                 // Comando a enviar
+                prompt_porta := ID_Dslam + '(config-if-adsl-0' + '/' + IntToStr(slot_adsl) + ')#'; // Retorno a receber
+
+
+                // Formatação de slot e porta para comparar com BD_MySql
+                if slot_adsl < 10 then slotAD := '0' + IntToStr(slot_adsl)
+                else slotAD := IntToStr(slot_adsl);
+                if porta_adsl < 10 then portaAD := '0' + IntToStr(porta_adsl)
+                else portaAD := IntToStr(porta_adsl);
+                ID_Porta := ID_Dslam + '-' + slotAD + '/' + portaAD;
+
+                // Mostra comandos enviados
+                MemoComandos.Lines.add(prompt_porta + ' ' + cmd_porta);
+
+                // Script(x,Y): envia comando X, recebe prompt Y da porta;
+                Script(cmd_porta,prompt_porta);
+
+                Profile5600(Profile, Up,Dn);                         // Analisa Vel Up-Down
+                EditarMySql(ID_Porta,ShState('MA5600'),Profile,Up,Dn);      // Atualizar registros no BD MySql
+
+                // Mostrar relatorio da consulta
+                // State(): verifica se Inativa, Ativa ou bloqueada
+                // Profile(): Analiza a velocidade da Porta
+                MemoResultado.Lines.Add('[' + ID_Porta + ']' + ' - ' + ShState('MA5600') + ' - ' + Up + '-' + Dn );
+
+          end;  // for porta_adsl
+           //********************************************************************************
+          Script('quit',ID_Dslam + '(config)#');     //Sai da placa volta ao config
+         end;  // if... salta 7 e 8
+         end; // for slot_adsl
+
+        //********************************************************************************
+        Script('quit',ID_Dslam + '#');          // Sai do config
+        Script('quit','Check whether system data has changed. Please save data before logout. Are you sure to log out? (y/n)[n]:');
+
+        Script('y','bash-2.03$');
+
+
+   result := true;
+
+end;
+
+function TMain.Script(comando, prompt: String) : Boolean;
+var
+   resultado: Boolean;
+begin
+
+ if MenuRastrear2.Checked then Rastrear('Script( ' + comando + ', ' + prompt + ' )');
+
+  // Mostra comandos enviados
+ MemoComandos.Lines.add(prompt_anterior + ' ' + comando);
+
+// Envia um comando. Neste caso, estamos enviando o comando_X + <enter>
+success := ssh.ChannelSendString(channelNum,comando + #13,'ansi');
+if (success <> 1) then
+  begin
+    MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add(ssh.SessionLog);
+    MemoShell.Lines.Add('ERRO 2001 ! [ ChannelSendString ]');
+    resultado := false;
+    Exit;
+  end;
+
+// Lê até o próximo comando prompt: TEBAJ663>
+success := ssh.ChannelReceiveUntilMatch(channelNum,prompt,'ansi',1);
+if (success <> 1) then
+  begin
+    // Verificar as informações de erro da última sessão e log ...
+    MemoShell.Lines.Add(ssh.LastErrorText);
+    MemoShell.Lines.Add(ssh.SessionLog);
+    // Check para ver o que foi recebido.
+    MemoShell.Lines.Add('-------------------------------------------------------');
+    MemoShell.Lines.Add(ssh.GetReceivedText(channelNum,'ansi'));
+    MemoShell.Lines.Add('-------------------------------------------------------');
+    MemoShell.Lines.Add('ERRO 2002 ! [ ChannelReceiveUntilMatch ]');
+    resultado := false;
+    Exit;
+  end;
+
+  prompt_anterior := prompt; // Memoriza ultimo prompt para re-escrever padrão de comunicação
+
+// Mostra a saída do comando:
+resposta := ssh.GetReceivedText(channelNum,'ansi');
+MemoShell.Lines.Add(resposta);
+
+result := resultado;
+
+end;
+
+//******************************************************************************
+function TMain.ShVersion: string;
+var
+   VersaoDslam: String;
+
+begin
+   if MenuRastrear2.Checked then Rastrear('ShVersion()');
+	 
+   if pos('MA5100', UpperCase(resposta))>0 then VersaoDslam := 'Huawei 5100';
+   if pos('MA5103', UpperCase(resposta))>0 then VersaoDslam := 'Huawei 5103';
+   if pos('MA5600', UpperCase(resposta))>0 then VersaoDslam := 'Huawei 5600';
+
+   if MenuRastrear2.Checked then Rastrear('ShState( ' + VersaoDslam + ' )');
+
+   result := VersaoDslam;
+
+end;
+
+
+
+function TMain.ShState(Versao: String): string;
+var
+   PTstatus: String;
+
+begin
+   if (Versao = 'MA5100')or(Versao = 'MA5600') then
+   begin
+        if pos('ACTIVE', UpperCase(resposta))>0 then PTstatus := 'Sincronizada';
+        if pos('ACTIVATED', UpperCase(resposta))>0 then PTstatus := 'Sincronizada';
+        if pos('ACTIVATING', UpperCase(resposta))>0 then PTstatus := 'Não sincroni';
+        if pos('DEACTIVE', UpperCase(resposta))>0 then PTstatus := 'Bloqueada';
+        if pos('DEACTIVATED', UpperCase(resposta))>0 then PTstatus := 'Bloqueada';
+   end;
+
+   if (Versao = 'MA5103') then
+   begin
+        if pos('OPERATING', UpperCase(resposta))>0 then PTstatus := 'Sincronizada';
+        if pos('ACTIVE', UpperCase(resposta))>0 then PTstatus := 'Não sincroni';
+//      if pos('DEACTIVE-X', UpperCase(resposta))>0 then PTstatus := 'Bloqueada';
+//      if pos('DEACTIVATED-X', UpperCase(resposta))>0 then PTstatus := 'Bloqueada';
+   end;  
+
+   if MenuRastrear2.Checked then Rastrear('ShState( ' + PTstatus + ' )');
+
+   result := PTstatus;
+end;
+
+procedure TMain.Profile5100(var Profile, Up, Dn: String);
+begin
+
+   if pos('ACTIVATE PROFILE:1', UpperCase(resposta))>0 then begin Profile := '1'; Dn := '6144'; Up :='640'; end;
+   if pos('ACTIVATE PROFILE:2', UpperCase(resposta))>0 then begin Profile := '2'; Dn := '320';  Up :='160'; end;
+   if pos('ACTIVATE PROFILE:3', UpperCase(resposta))>0 then begin Profile := '3'; Dn := '608';  Up :='320'; end;
+   if pos('ACTIVATE PROFILE:4', UpperCase(resposta))>0 then begin Profile := '4'; Dn := '1024'; Up :='320'; end;
+   if pos('ACTIVATE PROFILE:5', UpperCase(resposta))>0 then begin Profile := '5'; Dn := '256'; Up :='128'; end;
+   if pos('ACTIVATE PROFILE:6', UpperCase(resposta))>0 then begin Profile := '6'; Dn := '512'; Up :='128'; end;
+   if pos('ACTIVATE PROFILE:7', UpperCase(resposta))>0 then begin Profile := '7'; Dn := '1536'; Up :='256'; end;
+   if pos('ACTIVATE PROFILE:8', UpperCase(resposta))>0 then begin Profile := '8'; Dn := '128'; Up :='128'; end;
+   if pos('ACTIVATE PROFILE:9', UpperCase(resposta))>0 then begin Profile := '9'; Dn := '256'; Up :='256'; end;
+   if pos('ACTIVATE PROFILE:10', UpperCase(resposta))>0 then begin Profile := '10'; Dn := '512'; Up :='512'; end;
+   if pos('ACTIVATE PROFILE:11', UpperCase(resposta))>0 then begin Profile := '11'; Dn := '768'; Up :='128'; end;
+   if pos('ACTIVATE PROFILE:12', UpperCase(resposta))>0 then begin Profile := '12'; Dn := '160'; Up :='64'; end;
+   if pos('ACTIVATE PROFILE:13', UpperCase(resposta))>0 then begin Profile := '13'; Dn := '608'; Up :='160'; end;
+   if pos('ACTIVATE PROFILE:14', UpperCase(resposta))>0 then begin Profile := '14'; Dn := '608'; Up :='512'; end;
+   if pos('ACTIVATE PROFILE:15', UpperCase(resposta))>0 then begin Profile := '15'; Dn := '64'; Up :='64'; end;
+   if pos('ACTIVATE PROFILE:16', UpperCase(resposta))>0 then begin Profile := '16'; Dn := '416'; Up :='224'; end;
+   if pos('ACTIVATE PROFILE:17', UpperCase(resposta))>0 then begin Profile := '17'; Dn := '800'; Up :='320'; end;
+   if pos('ACTIVATE PROFILE:18', UpperCase(resposta))>0 then begin Profile := '18'; Dn := '1504'; Up :='320'; end;
+   if pos('ACTIVATE PROFILE:19', UpperCase(resposta))>0 then begin Profile := '19'; Dn := '320'; Up :='128'; end;
+   if pos('ACTIVATE PROFILE:20', UpperCase(resposta))>0 then begin Profile := '20'; Dn := '384'; Up :='384'; end;
+   if pos('ACTIVATE PROFILE:21', UpperCase(resposta))>0 then begin Profile := '21'; Dn := '1024'; Up :='512'; end;
+   if pos('ACTIVATE PROFILE:22', UpperCase(resposta))>0 then begin Profile := '22'; Dn := '2016'; Up :='512'; end;
+   if pos('ACTIVATE PROFILE:23', UpperCase(resposta))>0 then begin Profile := '23'; Dn := '224'; Up :='128'; end;
+
+   if MenuRastrear2.Checked then Rastrear('Profile5100( ' + Profile +', ' + Up + ', ' + Dn + ')');
+
+end;
+
+procedure TMain.Profile5103(var Profile, Up, Dn: String);
+begin
+     if ( pos('6144', UpperCase(resposta))>0)and( pos('640', UpperCase(resposta))>0) then begin Profile := '1'; Dn := '1024';  Up :='320'; end;
+     if ( pos('320', UpperCase(resposta))>0)and( pos('160', UpperCase(resposta))>0) then begin Profile := '2'; Dn := '1024';  Up :='320'; end;
+     if ( pos('608', UpperCase(resposta))>0)and( pos('320', UpperCase(resposta))>0) then begin Profile := '3'; Dn := '1024';  Up :='320'; end;
+     if ( pos('1024', UpperCase(resposta))>0)and( pos('320', UpperCase(resposta))>0) then begin Profile := '4'; Dn := '1024';  Up :='320'; end;
+     if ( pos('256', UpperCase(resposta))>0)and( pos('128', UpperCase(resposta))>0) then begin Profile := '5'; Dn := '1024';  Up :='320'; end;
+     if ( pos('512', UpperCase(resposta))>0)and( pos('128', UpperCase(resposta))>0) then begin Profile := '6'; Dn := '1024';  Up :='320'; end;
+     if ( pos('1536', UpperCase(resposta))>0)and( pos('256', UpperCase(resposta))>0) then begin Profile := '7'; Dn := '1024';  Up :='320'; end;
+     if ( pos('128', UpperCase(resposta))>0)and( pos('128', UpperCase(resposta))>0) then begin Profile := '8'; Dn := '1024';  Up :='320'; end;
+     if ( pos('256', UpperCase(resposta))>0)and( pos('256', UpperCase(resposta))>0) then begin Profile := '9'; Dn := '1024';  Up :='320'; end;
+     if ( pos('512', UpperCase(resposta))>0)and( pos('512', UpperCase(resposta))>0) then begin Profile := '10'; Dn := '1024';  Up :='320'; end;
+     if ( pos('768', UpperCase(resposta))>0)and( pos('128', UpperCase(resposta))>0) then begin Profile := '11'; Dn := '1024';  Up :='320'; end;
+     if ( pos('160', UpperCase(resposta))>0)and( pos('64', UpperCase(resposta))>0) then begin Profile := '12'; Dn := '1024';  Up :='320'; end;
+     if ( pos('608', UpperCase(resposta))>0)and( pos('160', UpperCase(resposta))>0) then begin Profile := '13'; Dn := '1024';  Up :='320'; end;
+     if ( pos('608', UpperCase(resposta))>0)and( pos('512', UpperCase(resposta))>0) then begin Profile := '14'; Dn := '1024';  Up :='320'; end;
+     if ( pos('64', UpperCase(resposta))>0)and( pos('64', UpperCase(resposta))>0) then begin Profile := '15'; Dn := '1024';  Up :='320'; end;
+     if ( pos('416', UpperCase(resposta))>0)and( pos('224', UpperCase(resposta))>0) then begin Profile := '16'; Dn := '1024';  Up :='320'; end;
+     if ( pos('800', UpperCase(resposta))>0)and( pos('320', UpperCase(resposta))>0) then begin Profile := '17'; Dn := '1024';  Up :='320'; end;
+     if ( pos('1504', UpperCase(resposta))>0)and( pos('320', UpperCase(resposta))>0) then begin Profile := '18'; Dn := '1024';  Up :='320'; end;
+     if ( pos('320', UpperCase(resposta))>0)and( pos('128', UpperCase(resposta))>0) then begin Profile := '19'; Dn := '1024';  Up :='320'; end;
+     if ( pos('384', UpperCase(resposta))>0)and( pos('384', UpperCase(resposta))>0) then begin Profile := '20'; Dn := '1024';  Up :='320'; end;
+     if ( pos('1024', UpperCase(resposta))>0)and( pos('512', UpperCase(resposta))>0) then begin Profile := '21'; Dn := '1024';  Up :='320'; end;
+     if ( pos('2016', UpperCase(resposta))>0)and( pos('512', UpperCase(resposta))>0) then begin Profile := '22'; Dn := '1024';  Up :='320'; end;
+     if ( pos('224', UpperCase(resposta))>0)and( pos('128', UpperCase(resposta))>0) then begin Profile := '23'; Dn := '1024';  Up :='320'; end;
+
+
+    if MenuRastrear2.Checked then Rastrear('Profile5103( ' + Profile +', ' + Up + ', ' + Dn + ')');
+
+end;
+
+procedure TMain.Profile5600(var Profile, Up, Dn: String);
+begin
+
+   if pos('DEFVAL', UpperCase(resposta))>0 then begin Profile := 'DEFVAL'; Dn := '6144';  Up :='640'; end;
+   if pos('2', UpperCase(resposta))>0 then begin Profile := '2'; Dn := '320';  Up :='160'; end;
+   if pos('3', UpperCase(resposta))>0 then begin Profile := '3'; Dn := '672';  Up :='320'; end;
+   if pos('4', UpperCase(resposta))>0 then begin Profile := '4'; Dn := '1120'; Up :='320'; end;
+   if pos('5', UpperCase(resposta))>0 then begin Profile := '5'; Dn := '320'; Up :='160'; end;
+   if pos('6', UpperCase(resposta))>0 then begin Profile := '6'; Dn := '512'; Up :='128'; end;
+   if pos('7', UpperCase(resposta))>0 then begin Profile := '7'; Dn := '2272'; Up :='576'; end;
+   if pos('8', UpperCase(resposta))>0 then begin Profile := '8'; Dn := '128'; Up :='128'; end;
+   if pos('9', UpperCase(resposta))>0 then begin Profile := '9'; Dn := '256'; Up :='256'; end;
+   if pos('10', UpperCase(resposta))>0 then begin Profile := '10'; Dn := '512'; Up :='512'; end;
+   if pos('11', UpperCase(resposta))>0 then begin Profile := '11'; Dn := '1120'; Up :='320'; end;
+   if pos('12', UpperCase(resposta))>0 then begin Profile := '12'; Dn := '160'; Up :='96'; end;
+   if pos('13', UpperCase(resposta))>0 then begin Profile := '13'; Dn := '672'; Up :='320'; end;
+   if pos('14', UpperCase(resposta))>0 then begin Profile := '14'; Dn := '608'; Up :='512'; end;
+   if pos('15', UpperCase(resposta))>0 then begin Profile := '15'; Dn := '64'; Up :='64'; end;
+   if pos('16', UpperCase(resposta))>0 then begin Profile := '16'; Dn := '672'; Up :='320'; end;
+   if pos('17', UpperCase(resposta))>0 then begin Profile := '17'; Dn := '1120'; Up :='320'; end;
+   if pos('18', UpperCase(resposta))>0 then begin Profile := '18'; Dn := '2272'; Up :='576'; end;
+   if pos('19', UpperCase(resposta))>0 then begin Profile := '19'; Dn := '320'; Up :='160'; end;
+   if pos('20', UpperCase(resposta))>0 then begin Profile := '20'; Dn := '384'; Up :='384'; end;
+   if pos('21', UpperCase(resposta))>0 then begin Profile := '21'; Dn := '1120'; Up :='320'; end;
+   if pos('22', UpperCase(resposta))>0 then begin Profile := '22'; Dn := '2272'; Up :='576'; end;
+   if pos('23', UpperCase(resposta))>0 then begin Profile := '23'; Dn := '320'; Up :='160'; end;
+   if pos('25', UpperCase(resposta))>0 then begin Profile := '25'; Dn := '2272'; Up :='576'; end;
+   if pos('26', UpperCase(resposta))>0 then begin Profile := '26'; Dn := '5664'; Up :='576'; end;
+   if pos('27', UpperCase(resposta))>0 then begin Profile := '27'; Dn := '8192'; Up :='416'; end;
+   if pos('28', UpperCase(resposta))>0 then begin Profile := '28'; Dn := '3136'; Up :='224'; end;
+   if pos('29', UpperCase(resposta))>0 then begin Profile := '29'; Dn := '3424'; Up :='384'; end;
+   if pos('30', UpperCase(resposta))>0 then begin Profile := '30'; Dn := '3840'; Up :='384'; end;
+
+   if MenuRastrear2.Checked then Rastrear('Profile5600( ' + Profile +', ' + Up + ', ' + Dn + ')');
+
+ end;
+
+
+function TMain.EditarMySql(Porta, Status, Profile, VelUP, VelDN: String): boolean;
+var
+   velUP_pt, velDN_pt: String;
+   status_pt, analise_st, Info_analise: String;
+
+begin
+    if MenuRastrear2.Checked then Rastrear('EditarMySql( ' + Porta + ' )');
+	 
+    // Seta valor vazio
+    velUP_pt :='';
+    velDN_pt :='';
+    analise_st := '';
+    Info_analise := 'Normal';
+   // data := Time;
+
+
+    // Procura registro, aponta para -> Porta
+    ZTbPtHuawei.Locate('obj_porta',Porta,[]);
+
+    // Comparar Status
+    if ( Status = 'Sincronizada') or (Status = 'Não sync') then status_pt := 'Ativa';
+    if ( Status = 'Bloqueda' ) then status_pt := 'Ativa';
+
+    if ( DbEdStatus.Text = 'Ativa') and (status_pt <> 'Ativa' ) then begin
+        analise_st := 'Status irregular';
+        Info_analise := 'Irregular';
+    end;
+
+    if ( DbEdStatus.Text <> 'Ativa') and (status_pt = 'Ativa' ) then begin
+        analise_st := 'Status irregular';
+        Info_analise := 'Irregular';
+    end;
+
+    if ( DdEdVelUP.Text <> VelUP ) then begin
+        velUP_pt :='Vel.Up Irregular';
+        Info_analise := 'Irregular';
+    end;
+
+    if ( DbEdVelDN.Text <> VelDN ) then begin
+        velUP_pt :='Vel.Dn Irregular';
+        Info_analise := 'Irregular';
+    end;
+
+
+    // Este código edita o registro que foi localizado acima
+       ZTbPtHuawei.Edit;
+       ZTbPtHuawei.FieldByName('egd_status').Value := Status;
+       ZTbPtHuawei.FieldByName('egd_profile').Value := Profile;
+       ZTbPtHuawei.FieldByName('egd_vel_up').Value := VelUP;
+       ZTbPtHuawei.FieldByName('egd_vel_dn').Value := VelDN;
+       ZTbPtHuawei.FieldByName('egd_analise').Value := Info_analise;
+       ZTbPtHuawei.FieldByName('egd_acao').Value := 'Monitorada';
+       ZTbPtHuawei.FieldByName('egd_obs').Value := analise_st +', ' + velUP_pt +', ' + velDN_pt;
+       ZTbPtHuawei.FieldByName('egd_data').Value := DateToStr(date());
+       ZTbPtHuawei.UpdateRecord;
+       ZTbPtHuawei.next;
+
+       result := true;
+
+end;
+
+// final das funções
+//******************************************************************************
+
+procedure TMain.BtScanearClick(Sender: TObject);
+begin
+        MenuConectar.Checked := true;
+        PnConectar.visible := true;
+        Main();
+end;
+
+procedure TMain.MenuRepositorio2Click(Sender: TObject);
+begin
+        if MenuRepositorio2.Checked then
+        begin
+           MenuRepositorio2.Checked := false;
+           GBRepositorio.Visible := false;
+        end else begin
+           MenuRepositorio2.Checked := true;
+           GBRepositorio.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+
+end;
+
+procedure TMain.Sobre2Click(Sender: TObject);
+begin
+        Sobre.showmodal;
+end;
+
+procedure TMain.BtScanClick(Sender: TObject);
+begin
+        Main();
+end;
+
+procedure TMain.BtSairClick(Sender: TObject);
+begin
+        application.terminate;
+end;
+
+
+end.

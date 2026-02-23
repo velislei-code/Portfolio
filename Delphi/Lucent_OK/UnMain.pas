@@ -1,0 +1,825 @@
+// by: Treuk, Velislei A
+//   email: velislei@gmail.com
+//   Copyright(c) 2010-2011
+//   Sistemas de Monitoramento e bloqueio de fraudes em portas ADSL em Massa 
+//   Projeto, excecução p/ Oi S/A
+//   All Rights Reserveds       
+
+{
+
+tr109065@wsacesso-CTA:~$ telnet 200.193.136.202
+Trying 200.193.136.202...
+Connected to 200.193.136.202.
+Escape character is '^]'.
+
+
+SunOS 5.8
+
+login: tr109065
+Password:
+Last login: Thu Aug  4 16:05:56 from 201.10.124.66
+
+bash-2.03$
+
+
+}
+unit UnMain;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Menus, ToolWin, ComCtrls, StdCtrls, Buttons, ExtCtrls, jpeg, DBCtrls,
+  Grids, DBGrids, Db, ZAbstractRODataset, ZAbstractDataset, ZAbstractTable,
+  ZDataset, ZConnection, OleCtrls, CHILKATSSHLib_TLB, Mask;
+
+type
+  TMain = class(TForm)
+    ToolBar1: TToolBar;
+    MainMenu1: TMainMenu;
+    Arquivo1: TMenuItem;
+    Abrir1: TMenuItem;
+    Novo1: TMenuItem;
+    N1: TMenuItem;
+    Sair1: TMenuItem;
+    MenuSistema: TMenuItem;
+    MenuConectar: TMenuItem;
+    Info1: TMenuItem;
+    Sobre1: TMenuItem;
+    N2: TMenuItem;
+    Sobre2: TMenuItem;
+    BtIdaeia: TSpeedButton;
+    BtPlaneta: TSpeedButton;
+    BtTools: TSpeedButton;
+    N3: TMenuItem;
+    MenuComandos1: TMenuItem;
+    MenuResultado1: TMenuItem;
+    MenuShell1: TMenuItem;
+    ZCon: TZConnection;
+    ZTbPtLucent: TZTable;
+    DsPtLucent: TDataSource;
+    ZTbDslamLucent: TZTable;
+    DsDslamLucent: TDataSource;
+    MenuRastrear2: TMenuItem;
+    MenuRepositorio2: TMenuItem;
+    PnConectar: TPanel;
+    PgCtrlDslam: TPageControl;
+    TSDslam: TTabSheet;
+    GBShell: TGroupBox;
+    GBRastrear: TGroupBox;
+    GBComandos: TGroupBox;
+    GBResultado: TGroupBox;
+    GBMySql: TGroupBox;
+    DbGTbPortas: TDBGrid;
+    DbGTbDslam: TDBGrid;
+    DbNTbPortas: TDBNavigator;
+    DbNTbDslam: TDBNavigator;
+    GBRepositorio: TGroupBox;
+    DbEdStatus: TDBEdit;
+    DdEdVelUP: TDBEdit;
+    DbEdVelDN: TDBEdit;
+    DbEdDslam_Reg: TDBEdit;
+    DbEdDslamID: TDBEdit;
+    DbEdDslamVersao: TDBEdit;
+    DbEdDslamPlacas: TDBEdit;
+    MemoShell: TMemo;
+    MemoComandos: TMemo;
+    MemoResultado: TMemo;
+    MemoRastrear: TMemo;
+    PnBotoes: TPanel;
+    BtConectar: TBitBtn;
+    Image1: TImage;
+    Bevel1: TBevel;
+    BtSair: TBitBtn;
+    Bevel2: TBevel;
+    Image2: TImage;
+    GbLogErro: TGroupBox;
+    MemoLogErro: TMemo;
+    MenuLogErro: TMenuItem;
+    LbData: TLabel;
+    Timer1: TTimer;
+    procedure MenuConectarClick(Sender: TObject);
+    procedure Sair1Click(Sender: TObject);
+    procedure BitBtn2Click(Sender: TObject);
+    procedure MenuComandos1Click(Sender: TObject);
+    procedure MenuRastrear2Click(Sender: TObject);
+    procedure MenuResultado1Click(Sender: TObject);
+    procedure MenuShell1Click(Sender: TObject);
+    procedure BtScanearClick(Sender: TObject);
+    procedure MenuRepositorio2Click(Sender: TObject);
+    procedure Sobre2Click(Sender: TObject);
+    procedure BtConectarClick(Sender: TObject);
+    procedure BtSairClick(Sender: TObject);
+    procedure MenuLogErroClick(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+  private
+    { Private declarations }
+    function Main: Boolean;
+    function Inicializar: Boolean;
+    function Conectar(hostname: String; port: Integer; login, senha: String): Boolean;
+    function Scanear: Boolean;
+    function Desconectar: Boolean;
+    function Rastrear(funcao: String): Boolean;
+    function Lucent24(ID_Dslam: String; num_placas: Integer): boolean;
+    function Script(comando, prompt: String): Boolean;
+    function ShVersion: string;
+    function ShState(Versao: String): string;
+    function EditarMySql(Porta, Status, Profile, VelUP, VelDN: String): boolean;
+
+    procedure Profile24(var Profile, Up, Dn: String);
+    procedure DefinirPlacaPorta;
+
+
+  public
+    { Public declarations }
+  end;
+
+var
+  Main: TMain;
+  ssh: TChilkatSsh;
+  success: Integer;
+  channelNum: Integer;
+  prompt_anterior, resposta: string;              // Recebe o retorno de show port state X
+  Teste_num_placas, Teste_num_portas: Integer;    // Num de portas a testar
+  Shelf: Integer;                 // Denine num placas no Shelf
+  Placa: array[1..100] of Integer;                // Denine num portas na placa
+
+
+implementation
+
+uses DgSobre;
+
+{$R *.DFM}
+
+procedure TMain.MenuConectarClick(Sender: TObject);
+begin
+        if MenuConectar.Checked then
+        begin
+            MenuConectar.Checked := false;
+            PnConectar.visible := false;
+        end else begin
+            MenuConectar.Checked := true;
+            PnConectar.visible := true;
+        end;
+end;
+
+procedure TMain.Sair1Click(Sender: TObject);
+begin
+        application.terminate;
+end;
+
+procedure TMain.BitBtn2Click(Sender: TObject);
+begin
+        application.terminate;
+end;
+
+procedure TMain.MenuComandos1Click(Sender: TObject);
+begin
+        if MenuComandos1.Checked then
+        begin
+           MenuComandos1.Checked := false;
+           GBComandos.Visible := false;
+        end else begin
+           MenuComandos1.Checked := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+           GBComandos.Visible := true;
+        end;
+end;
+
+procedure TMain.MenuRastrear2Click(Sender: TObject);
+begin
+        if MenuRastrear2.Checked then
+        begin
+           MenuRastrear2.Checked := false;
+           GBRastrear.Visible := false;
+        end else begin
+           MenuRastrear2.Checked := true;
+           GBRastrear.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+
+end;
+
+procedure TMain.MenuResultado1Click(Sender: TObject);
+begin
+        if MenuResultado1.Checked then
+        begin
+           MenuResultado1.Checked := false;
+           GBResultado.Visible := false;
+        end else begin
+           MenuResultado1.Checked := true;
+           GBResultado.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+
+end;
+
+procedure TMain.MenuShell1Click(Sender: TObject);
+begin
+        if MenuShell1.Checked then
+        begin
+           MenuShell1.Checked := false;
+           GBShell.Visible := false;
+        end else begin
+           MenuShell1.Checked := true;
+           GBShell.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+end;
+
+
+//******************************************************************************
+// Funções
+
+function TMain.Main: Boolean;
+begin
+        if MenuRastrear2.Checked then Rastrear('Main()');
+        Inicializar();
+	if ( Conectar('10.142.184.93',22,'tr109065','14qrafzv') ) then           // Inicia conexão com Servidor
+        begin Scanear(); end;                     			         // Inicia varredura das portas 
+        Desconectar();
+end;
+
+function TMain.Inicializar: Boolean;
+begin
+        if MenuRastrear2.Checked then Rastrear('Inicializar()');
+
+        Teste_num_placas := 1;
+        Teste_num_portas := 3;
+        prompt_anterior := '';                                                 // Limita num de portas por placas
+
+end;
+
+
+function TMain.Rastrear(funcao: String): Boolean;
+begin
+	MemoRastrear.Lines.Add(funcao);
+end;
+
+function TMain.Conectar(hostname: String; port: Integer; login, senha: String): Boolean;
+var
+   termType: String;
+   widthInChars: Integer;
+   heightInChars: Integer;
+   pixWidth: Integer;
+   pixHeight: Integer;
+   resultado: boolean;
+
+begin
+
+    if MenuRastrear2.Checked then Rastrear('Conectar()');
+
+    resultado := true;						// Inicialmente considera conexão como OK
+
+// Importante: É útil para enviar o conteúdo do
+// Propriedade ssh.LastErrorText / ao solicitar apoio.
+
+ssh := TChilkatSsh.Create(Self);
+
+
+// Qualquer string começa automaticamente a um julgamento totalmente funcional por 30 dias.
+success := ssh.UnlockComponent('30-day trial');
+if (success <> 1) then
+begin
+    MemoLogErro.Lines.Add('ERRO 1001 ! [UnlockComponent] ');
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    resultado := false;
+    Exit;
+end;
+
+// Mantenha um registro de sessão, que está disponível através do SessionLog
+// Propriedade:
+ssh.KeepSessionLog := 1;
+
+MemoShell.Lines.Add('Iniciando conexão com o servidor Tacaks! Aguarde...');
+success := ssh.Connect(hostname,port);
+if (success <> 1) then
+begin
+    MemoLogErro.Lines.Add('ERRO 1002 ! [Connect]');
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+
+// Ao ler, se não houver dados adicionais chega a mais de
+// 5 segundos, então abortar:
+ssh.IdleTimeoutMs := 5000;
+
+// Autenticação de Servidor SSH
+// Se não houver um login / password necessário, você ainda deve chamar
+// AuthenticatePw e usar quaisquer valores para login / password.
+success := ssh.AuthenticatePw(login,senha);
+if (success <> 1) then
+  begin
+    // MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add('ERRO 1003 ! [AuthenticatePw]');
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+
+// Abrir um canal de sessão.
+channelNum := ssh.OpenSessionChannel();
+if (channelNum < 0) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add('ERRO 1004! [OpenSessionChannel]');
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+
+// Pedir uma pseudo-terminal
+termType := 'dumb';
+widthInChars := 120;
+heightInChars := 40;
+pixWidth := 0;
+pixHeight := 0;
+success := ssh.SendReqPty(channelNum,termType,widthInChars,heightInChars,pixWidth,pixHeight);
+if (success <> 1) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add('ERRO 1005 ! [SendReqPty]');
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end ;
+
+
+// Iniciar uma shell no canal:
+success := ssh.SendReqShell(channelNum);
+if (success <> 1) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add('ERRO 1006 ! [SendReqShell]');
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    resultado := false;
+    Exit;
+end;
+
+        result := resultado;
+
+end; // final função Acessar
+
+function TMain.Scanear: Boolean;
+var
+	TD, Total_Dslam, Num_Placas: Integer;
+	Nome_Dslam, Versao_Dslam: String;
+
+begin
+//********************************************************************************************
+// Inicia varredura
+
+        if MenuRastrear2.Checked then Rastrear('Scanear()');
+
+        // Entra no servidor Lucent
+        Script('telnet 200.193.136.202','login:');
+        Script('tr109065','Password:');
+        Script('Vat101al','bash-2.03$');
+
+
+        ZTbDslamLucent.last;                             // Aponta para o ultimo registro
+        Total_Dslam := StrToInt(DbEdDslam_Reg.Text);    // Pega total de Dslam´s na tabela
+        for TD := 1 to Total_Dslam do
+        begin
+             ZTbDslamLucent.Locate('registro',TD,[]);          // Aponta para registro correspondente
+             Nome_Dslam := (DbEdDslamID.text);               // Pega ID do dslam
+             Num_Placas :=  StrToInt(DbEdDslamPlacas.text);  // Pega Total de placas
+             Versao_Dslam := DbEdDslamVersao.text;                // Pega Versao
+
+//             if (Versao_Dslam = 'Lin24') then MemoComunica.Lines.Add('Teste ! Conexão com: ' + IntToStr(TD) + '=' + Nome_Dslam + '-' + Versao_Dslam + '-' + IntToStr(Num_Placas) );
+             if (Versao_Dslam = 'Lin24') then Lucent24(Nome_Dslam,Num_Placas);  // Executa acesso ao Lucent
+             if (Versao_Dslam = 'Lin48') then Lucent24(Nome_Dslam,Num_Placas);  // Executa acesso ao Lucent 5100
+             if (Versao_Dslam = 'Lin72') then Lucent24(Nome_Dslam,Num_Placas);  // Executa acesso ao Lucent 5100
+
+        end;
+
+        Script('exit','tr109065@wsacesso-CTA:~$');    // Sai do servidor Lucent
+        Script('exit','');                            // Sai do servidor Tacaks
+//********************************************************************************************
+end;   // Final da função Scanear
+
+function TMain.Desconectar: Boolean;
+begin
+
+ if MenuRastrear2.Checked then Rastrear('Desconectar()');
+ 
+// Envia um comando. Neste caso, estamos enviando o "exit" comando:
+success := ssh.ChannelSendString(channelNum,'exit' + #13,'ansi');
+if (success <> 1) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    Exit;
+  end;
+
+
+// Você pode continuar a enviar comandos adicionais.
+// A técnica é: enviar o comando, leia até o próximo comando prompt,
+// E depois buscar / limpar o buffer de recepção interna.
+
+// Nós somos feitos, então desligá-lo ..
+
+// Enviar um EOF. Isso informa ao servidor que mais nenhum dado será
+// Ser enviadas neste canal. O canal permanece aberto e
+// O cliente SSH pode ainda receber saída neste canal.
+success := ssh.ChannelSendEof(channelNum);
+if (success <> 1) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    Exit;
+  end;
+
+
+//  Fechar canal:
+success := ssh.ChannelSendClose(channelNum);
+if (success <> 1) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    Exit;
+  end;
+
+        BtConectar.enabled := true;
+        BtSair.enabled := true;
+  
+//  Disconnect
+ ssh.Disconnect();
+
+   result := true;
+end;  // Final função Desconectar
+
+function TMain.Lucent24(ID_Dslam: String; num_placas: Integer): boolean;
+var
+   slot_adsl, porta_adsl: Integer;
+   cmd_slot, prompt_slot, cmd_porta, prompt_porta: String;
+   slotAD, portaAD, ID_Porta: String;
+   Profile, Up, Dn : String;
+   Estado_porta: String;
+   T, TotalPlaca, TotalPorta: Integer;
+
+begin
+	 if MenuRastrear2.Checked then Rastrear('Lucent24()');
+	 
+    //******************************************************************************
+// Script´s
+
+        Script('telnet ' + ID_Dslam,'User:');
+        Script('admin','Password:');
+        Script('alu2008',ID_Dslam + '#');
+
+        // Consulta num portas por placa
+        Script('uptime -a',ID_Dslam + '#');
+        DefinirPlacaPorta();
+
+        for T:=1 to 16 do begin
+          MemoRastrear.Lines.Add(IntToStr(Shelf) + ' - ' + IntToStr(Placa[T]));
+        end;
+
+
+        //Entra no slot
+        for slot_adsl:=1 to Shelf do
+        begin
+        if (slot_adsl <> 8)and(slot_adsl <> 9) then begin   // Saltar placas 7 e 8 (MMX)
+
+          //********************************************************************************
+          // Consulta a porta dentro do slot
+          for porta_adsl:=1 to Placa[slot_adsl] do
+          begin
+                  // ENVIA COMANDO E PROCURA POR:
+                  cmd_slot := 'get al-dmt-stat {1 '+ IntToStr(slot_adsl) + ' ' + IntToStr(porta_adsl) + '}physical-statu';                              // Comando
+                  prompt_slot := ID_Dslam + '#';
+                  Script(cmd_slot,prompt_slot);                                                 // Script a enviar
+
+                  // procura por:
+                  // dev-line-state = port-up
+                  // dev-line-state = download
+                  // dev-line-state = down
+                  Estado_porta := ShState('Lucent24');
+
+                  // ENVIA COMANDO:
+                  cmd_slot := 'get al-dmt {1 '+ IntToStr(slot_adsl) + ' ' + IntToStr(porta_adsl) + '}';                              // Comando
+                  prompt_slot := ID_Dslam + '#';
+                  Script(cmd_slot,prompt_slot);
+
+                  //Procura por
+                  // fast-path-config = { 32 32 160 320 160 320 }                                                // Script a enviar
+                  Profile24(Profile,Up,Dn);                         // Analisa Vel Up-Down
+
+                // Formatação de slot e porta para comparar com BD_MySql
+                if slot_adsl < 10 then slotAD := '0' + IntToStr(slot_adsl)
+                else slotAD := IntToStr(slot_adsl);
+                if porta_adsl < 10 then portaAD := '0' + IntToStr(porta_adsl)
+                else portaAD := IntToStr(porta_adsl);
+                ID_Porta := ID_Dslam + '-' + slotAD + '/' + portaAD;
+
+                EditarMySql(ID_Porta,Estado_porta,Profile,Up,Dn);      // Atualizar registros no BD MySql
+
+                // Mostrar relatorio da consulta
+                // State(): verifica se Inativa, Ativa ou bloqueada
+                // Profile(): Analiza a velocidade da Porta
+                MemoResultado.Lines.Add('[' + ID_Porta + ']' + ' - ' + Estado_porta + ' - ' + Up + '-' + Dn );
+
+          end;  // for porta_adsl
+           //********************************************************************************
+         end;  // if... salta 7 e 8
+         end; // for slot_adsl
+
+        //********************************************************************************
+         Script('quit','bash-2.03$');                   // Sai do Dslam
+
+   result := true;
+
+end;   // Final da função 
+
+
+function TMain.Script(comando, prompt: String) : Boolean;
+var
+   resultado: Boolean;
+begin
+
+ LbData.Caption := DateTimeToStr(Now);   // Atualiza data no Painel
+ if MenuRastrear2.Checked then Rastrear('Script( ' + comando + ', ' + prompt + ' )');
+
+ // Mostra comandos enviados
+ MemoComandos.Lines.add(prompt_anterior + ' ' + comando);
+
+
+// Envia um comando. Neste caso, estamos enviando o comando_X + <enter>
+success := ssh.ChannelSendString(channelNum,comando + #13,'ansi');
+if (success <> 1) then
+  begin
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    MemoLogErro.Lines.Add('ERRO 2001 ! [ ChannelSendString ]');
+    resultado := false;
+    Exit;
+  end;
+
+// Lê até o próximo comando prompt: TEBAJ663>
+success := ssh.ChannelReceiveUntilMatch(channelNum,prompt,'ansi',1);
+if (success <> 1) then
+  begin
+    // Verificar as informações de erro da última sessão e log ...
+    MemoLogErro.Lines.Add(ssh.LastErrorText);
+    MemoLogErro.Lines.Add(ssh.SessionLog);
+    // Check para ver o que foi recebido.
+    MemoShell.Lines.Add(ssh.GetReceivedText(channelNum,'ansi'));
+    MemoLogErro.Lines.Add('ERRO 2002 ! [ ChannelReceiveUntilMatch ]');
+    resultado := false;
+    Exit;
+  end;
+
+  prompt_anterior := prompt;
+
+// Mostra a saída do comando:
+resposta := ssh.GetReceivedText(channelNum,'ansi');
+MemoShell.Lines.Add(resposta);
+
+result := resultado;
+
+end;
+
+//******************************************************************************
+function TMain.ShVersion: string;
+var
+   VersaoDslam: String;
+
+begin
+   if MenuRastrear2.Checked then Rastrear('ShVersion()');
+	 
+   if pos('MA5100', UpperCase(resposta))>0 then VersaoDslam := 'Lucent 5100';
+   if pos('MA5103', UpperCase(resposta))>0 then VersaoDslam := 'Lucent 5103';
+   if pos('MA5600', UpperCase(resposta))>0 then VersaoDslam := 'Lucent 5600';
+
+   if MenuRastrear2.Checked then Rastrear('ShState( ' + VersaoDslam + ' )');
+
+   result := VersaoDslam;
+
+end;
+
+
+
+function TMain.ShState(Versao: String): string;
+var
+   PTstatus: String;
+
+begin
+        if pos('dev-line-state = port-up', resposta)>0 then PTstatus := 'Sincronizada';
+        if pos('dev-line-state = download', resposta)>0 then PTstatus := 'Não sincroni';
+        if PTstatus <> 'Não sincroni' then                                              // Coincide com down
+              if pos('dev-line-state = down', resposta)>0 then PTstatus := 'Bloqueada';
+
+   if MenuRastrear2.Checked then Rastrear('ShState( ' + PTstatus + ' )');
+
+   result := PTstatus;
+   
+end;
+
+procedure TMain.Profile24(var Profile, Up, Dn: String);
+begin
+
+   if pos('320 1120', resposta)>0 then begin Profile := '1120_320'; Dn := '1120'; Up :='320'; end;
+   if pos('512 512', resposta)>0 then begin Profile := '512_512'; Dn := '512'; Up :='512'; end;
+   if pos('160 320', resposta)>0 then begin Profile := '160_320'; Dn := '320'; Up :='160'; end;
+   if pos('320 672', resposta)>0 then begin Profile := '320_672'; Dn := '672'; Up :='320'; end;
+   if pos('256 256', resposta)>0 then begin Profile := '256_256'; Dn := '256'; Up :='256'; end;
+
+   if MenuRastrear2.Checked then Rastrear('Profile24( ' + Profile +', ' + Up + ', ' + Dn + ')');
+
+end;
+
+
+function TMain.EditarMySql(Porta, Status, Profile, VelUP, VelDN: String): boolean;
+var
+   velUP_pt, velDN_pt: String;
+   status_pt, analise_st, Info_analise: String;
+
+begin
+    if MenuRastrear2.Checked then Rastrear('EditarMySql( ' + Porta + ' )');
+	 
+    // Seta valor vazio
+    velUP_pt :='';
+    velDN_pt :='';
+    analise_st := '';
+    Info_analise := 'Normal';
+   // data := Time;
+
+
+    // Procura registro, aponta para -> Porta
+    ZTbPtLucent.Locate('obj_porta',Porta,[]);
+
+    // Comparar Status
+    if ( Status = 'Sincronizada') or (Status = 'Não sync') then status_pt := 'Ativa';
+    if ( Status = 'Bloqueda' ) then status_pt := 'Ativa';
+
+    if ( DbEdStatus.Text = 'Ativa') and (status_pt <> 'Ativa' ) then begin
+        analise_st := 'Status irregular';
+        Info_analise := 'Irregular';
+    end;
+
+    if ( DbEdStatus.Text <> 'Ativa') and (status_pt = 'Ativa' ) then begin
+        analise_st := 'Status irregular';
+        Info_analise := 'Irregular';
+    end;
+
+    if ( DdEdVelUP.Text <> VelUP ) then begin
+        velUP_pt :='Vel.Up Irregular';
+        Info_analise := 'Irregular';
+    end;
+
+    if ( DbEdVelDN.Text <> VelDN ) then begin
+        velUP_pt :='Vel.Dn Irregular';
+        Info_analise := 'Irregular';
+    end;
+
+
+    // Este código edita o registro que foi localizado acima
+       ZTbPtLucent.Edit;
+       ZTbPtLucent.FieldByName('egd_status').Value := Status;
+       ZTbPtLucent.FieldByName('egd_profile').Value := Profile;
+       ZTbPtLucent.FieldByName('egd_vel_up').Value := VelUP;
+       ZTbPtLucent.FieldByName('egd_vel_dn').Value := VelDN;
+       ZTbPtLucent.FieldByName('egd_analise').Value := Info_analise;
+       ZTbPtLucent.FieldByName('egd_acao').Value := 'Monitorada';
+       ZTbPtLucent.FieldByName('egd_obs').Value := analise_st +', ' + velUP_pt +', ' + velDN_pt;
+       ZTbPtLucent.FieldByName('egd_data').Value := DateTimeToStr(Now);
+       ZTbPtLucent.UpdateRecord;
+       ZTbPtLucent.next;
+
+       result := true;
+
+end;
+
+// final das funções
+//******************************************************************************
+
+procedure TMain.DefinirPlacaPorta;
+var
+   SS: Integer;
+begin
+
+   Shelf := 2;                          // 2 controladoras    
+   for SS:=1 to 16 do  Placa[SS]:=0;    //Zera
+
+   if pos('{ shelf-1 slot-1 } dadsl-atm-24-card', resposta)>0 then Placa[1] := 24;
+   if pos('{ shelf-1 slot-2 } dadsl-atm-24-card', resposta)>0 then Placa[2] := 24;
+   if pos('{ shelf-1 slot-3 } dadsl-atm-24-card', resposta)>0 then Placa[3] := 24;
+   if pos('{ shelf-1 slot-4 } dadsl-atm-24-card', resposta)>0 then Placa[4] := 24;
+   if pos('{ shelf-1 slot-5 } dadsl-atm-24-card', resposta)>0 then Placa[5] := 24;
+   if pos('{ shelf-1 slot-6 } dadsl-atm-24-card', resposta)>0 then Placa[6] := 24;
+   if pos('{ shelf-1 slot-7 } dadsl-atm-24-card', resposta)>0 then Placa[7] := 24;
+   if pos('{ shelf-1 slot-10 } dadsl-atm-24-card', resposta)>0 then Placa[10] := 24;
+   if pos('{ shelf-1 slot-11 } dadsl-atm-24-card', resposta)>0 then Placa[11] := 24;
+   if pos('{ shelf-1 slot-12 } dadsl-atm-24-card', resposta)>0 then Placa[12] := 24;
+   if pos('{ shelf-1 slot-13 } dadsl-atm-24-card', resposta)>0 then Placa[13] := 24;
+   if pos('{ shelf-1 slot-14 } dadsl-atm-24-card', resposta)>0 then Placa[14] := 24;
+   if pos('{ shelf-1 slot-15 } dadsl-atm-24-card', resposta)>0 then Placa[15] := 24;
+   if pos('{ shelf-1 slot-16 } dadsl-atm-24-card', resposta)>0 then Placa[16] := 24;
+
+   if pos('{ shelf-1 slot-1 } stngr-48', resposta)>0 then Placa[1] := 48;
+   if pos('{ shelf-1 slot-2 } stngr-48', resposta)>0 then Placa[2] := 48;
+   if pos('{ shelf-1 slot-3 } stngr-48', resposta)>0 then Placa[3] := 48;
+   if pos('{ shelf-1 slot-4 } stngr-48', resposta)>0 then Placa[4] := 48;
+   if pos('{ shelf-1 slot-5 } stngr-48', resposta)>0 then Placa[5] := 48;
+   if pos('{ shelf-1 slot-6 } stngr-48', resposta)>0 then Placa[6] := 48;
+   if pos('{ shelf-1 slot-7 } stngr-48', resposta)>0 then Placa[7] := 48;
+   if pos('{ shelf-1 slot-10 } stngr-48', resposta)>0 then Placa[10] := 48;
+   if pos('{ shelf-1 slot-11 } stngr-48', resposta)>0 then Placa[11] := 48;
+   if pos('{ shelf-1 slot-12 } stngr-48', resposta)>0 then Placa[12] := 48;
+   if pos('{ shelf-1 slot-13 } stngr-48', resposta)>0 then Placa[13] := 48;
+   if pos('{ shelf-1 slot-14 } stngr-48', resposta)>0 then Placa[14] := 48;
+   if pos('{ shelf-1 slot-15 } stngr-48', resposta)>0 then Placa[15] := 48;
+   if pos('{ shelf-1 slot-16 } stngr-48', resposta)>0 then Placa[16] := 48;
+
+   if pos('{ shelf-1 slot-1 } stngr-72', resposta)>0 then Placa[1] := 72;
+   if pos('{ shelf-1 slot-2 } stngr-72', resposta)>0 then Placa[2] := 72;
+   if pos('{ shelf-1 slot-3 } stngr-72', resposta)>0 then Placa[3] := 72;
+   if pos('{ shelf-1 slot-4 } stngr-72', resposta)>0 then Placa[4] := 72;
+   if pos('{ shelf-1 slot-5 } stngr-72', resposta)>0 then Placa[5] := 72;
+   if pos('{ shelf-1 slot-6 } stngr-72', resposta)>0 then Placa[6] := 72;
+   if pos('{ shelf-1 slot-7 } stngr-72', resposta)>0 then Placa[7] := 72;
+   if pos('{ shelf-1 slot-10 } stngr-72', resposta)>0 then Placa[10] := 72;
+   if pos('{ shelf-1 slot-11 } stngr-72', resposta)>0 then Placa[11] := 72;
+   if pos('{ shelf-1 slot-12 } stngr-72', resposta)>0 then Placa[12] := 72;
+   if pos('{ shelf-1 slot-13 } stngr-72', resposta)>0 then Placa[13] := 72;
+   if pos('{ shelf-1 slot-14 } stngr-72', resposta)>0 then Placa[14] := 72;
+   if pos('{ shelf-1 slot-15 } stngr-72', resposta)>0 then Placa[15] := 72;
+   if pos('{ shelf-1 slot-16 } stngr-72', resposta)>0 then Placa[16] := 72;
+
+   for SS:=1 to 16 do if Placa[SS] > 10 then Inc(Shelf);        // Conta num de placas no Shelf
+
+
+   if MenuRastrear2.Checked then Rastrear('DefinirPlacaPorta()');
+
+end;
+
+procedure TMain.BtScanearClick(Sender: TObject);
+begin
+        MenuConectar.Checked := true;
+        PnConectar.visible := true;
+        Main();
+end;
+
+procedure TMain.MenuRepositorio2Click(Sender: TObject);
+begin
+        if MenuRepositorio2.Checked then
+        begin
+           MenuRepositorio2.Checked := false;
+           GBRepositorio.Visible := false;
+        end else begin
+           MenuRepositorio2.Checked := true;
+           GBRepositorio.Visible := true;
+           MenuConectar.Checked := true;
+           PnConectar.visible := true;
+        end;
+
+end;
+
+procedure TMain.Sobre2Click(Sender: TObject);
+begin
+        Sobre.showmodal;
+end;
+
+procedure TMain.BtConectarClick(Sender: TObject);
+begin
+
+        BtConectar.enabled := false;
+        BtSair.enabled := false;
+        Main();
+end;
+
+procedure TMain.BtSairClick(Sender: TObject);
+begin
+        application.terminate;
+end;
+
+
+procedure TMain.MenuLogErroClick(Sender: TObject);
+begin
+        if MenuLogErro.Checked then
+        begin
+           MenuLogErro.Checked := false;
+           GBLogErro.Visible := false;
+        end else begin
+           MenuLogErro.Checked := true;
+           GBLogErro.Visible := true;
+        end;
+
+end;
+
+procedure TMain.Timer1Timer(Sender: TObject);
+begin
+        LbData.caption := DateTimeToStr(Now);
+end;
+
+end.

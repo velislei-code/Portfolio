@@ -1,0 +1,4 @@
+>>> Warning 202 "main.c" Line 44(7,16): Variable never used:   analogico
+>>> Warning 202 "main.c" Line 160(23,32): Variable never used:   fContaRpm
+      Memory usage:   ROM=26%      RAM=8% - 17%
+      0 Errors,  2 Warnings.

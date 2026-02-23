@@ -1,0 +1,267 @@
+#include <main.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
+
+// =============================================================================================================
+// --- Mapeamento de Hardware ---
+#define defTime       1
+#define defTamLinRX   15     
+#define defBusLocal 0
+#define defBusRem   1
+#define defPorta    0
+
+// ----- Declar Var-Constantes ------------------------------------------------
+const char cCI[5] = "PIC";
+const char cMod[10] = "16F1827";
+const char cMsgFail[20] = "Erro, cmd inv";
+
+// ----- Declara Var´s---------------------------------------------------------
+int iDigNum;                  // Conta num de char-RX
+char cLinComRX[defTamLinRX];  // Armazena linha de comunicação serial, linhas sempre se formaram de \(Inicio), Msg, ;(fim)
+boolean bPrompt;              // Ctrl responder ou não
+boolean bBusLocalAtivo;       // Ctrl-info Bus conectado
+char cMyID[defTamLinRX];                // Endereço da placa
+
+//char cRX;                     
+
+// ---- Declara funções --------------------------------------------------------
+void _init();                    // Inicia variáveis
+void help();                     // Lista comandos
+void lerPortaCom(int iPorta);    // Escuta eventos da porta com
+char Comando(char xLinRX);       // Interpretador de comandos Terminal
+void fixarBUS(int iBus);         // Fixa Bus em local ou remoto
+void reset();
+  
+
+char FuncaoPinAtmega328p(char sP);
+int PinAtmega328pToArduino(char sP);
+
+
+// Trata da interrupção
+#INT_RDA          // Tem que ficar junto void  RDA_isr(void)  - se não não funciona
+void  RDA_isr(void) 
+{
+// Toda vez q o PIC receber algum dado da serial, ele interrompe o programa(while) e
+// vem aqui(se tiver num delay, sai do delay, exec.aqui e volta pro while
+  
+   lerPortaCom(0);
+  
+}
+
+void main()
+{
+
+   enable_interrupts(INT_RDA);
+   enable_interrupts(GLOBAL);
+   
+   _init();
+   
+  
+
+   while(TRUE)
+   {
+      //TODO: User Code      
+      //output_toggle(pin_b0);
+      delay_ms(3000);
+      
+      
+   }
+
+}
+
+void _init(){
+     
+     output_high(pin_B0);              // Coloca pino B0_conectado ao MCLR em 1(funcionamento) 
+     cMyID = "000";                    // My endereço Inicial
+     fixarBus(defBusLocal);            // habilita TX-Local, conecta ao BUS    
+     bPrompt = true;                   // Exibe Prompt, na realidade é uma mensagem-serial do MC ao terminal 
+     printf("%s%s> ", cCI, cMyID);     // imprime prompt de comando   
+   
+}
+
+void lerPortaCom(int iPorta){
+
+
+  
+   // printf(">>P0"); 
+   
+  char cRX = getc();     // Recebe na porta Serial
+   
+          if(cRX == '\\'){
+          //  limpaLinhaRX();           // Limpa Var com Lina de ComRX
+            iDigNum = 0;              // Char indicativo inicio de linha-Com 
+           // printf(">>P1\r\n"); 
+          }      
+
+          if( (cRX != '\\')&&(cRX != ';') ){     // Se Char de Inicio e fim de linha, monta a linhaCo
+              if(!isDigit(cRX)){
+                cRX = cRX & ~(0x20);            // Se NÃO for numero...char.toUppercase
+                  // printf(">>P2\r\n"); 
+              }
+              cLinComRX[iDigNum] = cRX;       // Monta Linha
+              iDigNum++;                      // Incrementa digto da linha
+          }
+
+          if(cRX == ';'){                     // Se for fim de linha...imprime no lcd
+                
+              char cRxCmd = cMsgFail;
+              bPrompt = true;
+              
+               // Rotina pra limitar tamanho do cmd digitado pelo usuário
+              if((iDigNum>3)&&(iDigNum<defTamLinRX)){  
+                     cRxCmd = Comando(cLinComRX); 
+                     if(bPrompt){            
+                           //limparBufferLinRX();       
+                           memset (cLinComRX, '\0', sizeof(cLinComRX)); // \0 = ''
+                           memset(cRX,'\0',sizeof(cRX)); 
+                           delay_ms(100);
+                           bPrompt = false;                          // Bloqueia p/ evitar resposta repetida                
+                           printf("%s%c%c%c> %s", cCI, cMyID[0], cMyID[1], cMyID[2], cRxCmd);   // prompt de comando    
+                     }
+                     memset(cRxCmd,'\0',sizeof(cRxCmd));
+              }else{ printf("\r\n%s%c%c%c# %s - e101\r\n", cCI, cMyID[0], cMyID[1], cMyID[2], cMsgFail); }
+             
+          }
+ 
+}
+
+
+
+int PinAtmega328pToArduino(char sP){
+    // Converte id-pinos Atmega328p p/ id-arduino
+
+    int iRes = 100;     // Default Retorna num.nulo 
+
+    //         CI         ARDUINO             CI   
+    // Pinos digitais  
+    if(sP == "PB0"){ iRes = 8; }         //  14       
+    else if(sP == "PB1"){ iRes = 9; }    //  15  
+    else if(sP == "PB2"){ iRes = 10; }   //  16
+    else if(sP == "PB3"){ iRes = 11; }   //  17
+    else if(sP == "PB4"){ iRes = 12; }   //  18
+    else if(sP == "PB5"){ iRes = 13; }   //  19
+    else if(sP == "PB6"){ iRes = 101; }  //   9         Não disponivel no arduino
+    else if(sP == "PB7"){ iRes = 102; }  //  10         Não disponível no arduino
+
+    // Pinos Analógicos
+    else if(sP == "PC0"){ iRes = 14; }   //  23        A0
+    else if(sP == "PC1"){ iRes = 15; }   //  24        A1
+    else if(sP == "PC2"){ iRes = 16; }   //  25        A2
+    else if(sP == "PC3"){ iRes = 17; }   //  26        A3
+    else if(sP == "PC4"){ iRes = 18; }   //  27        A4
+    else if(sP == "PC5"){ iRes = 19; }   //  28        A5
+    else if(sP == "PC6"){ iRes = 1; }    //  01        A6  RESET     
+    else if(sP == "PC7"){ iRes = 103; }  //            A7
+
+    else if(sP == "PD0"){ iRes = 0; }    //  02        RX
+    else if(sP == "PD1"){ iRes = 1; }    //  03        TX
+    else if(sP == "PD2"){ iRes = 2; }    //  04        
+    else if(sP == "PD3"){ iRes = 3; }    //  05
+    else if(sP == "PD4"){ iRes = 4; }    //  06
+    else if(sP == "PD5"){ iRes = 5; }    //  11
+    else if(sP == "PD6"){ iRes = 6; }    //  12
+    else if(sP == "PD7"){ iRes = 7; }    //  13  
+
+    else{ iRes = 100; }
+
+
+    return iRes;
+
+}
+
+char FuncaoPinAtmega328p(char sP){
+    // Converte id-pinos Atmega328p p/ id-arduino
+
+    char sRes = "Null";     // Default Retorna num.nulo 
+
+    //         CI         ARDUINO              CI   
+    // Pinos digitais  
+    if(sP == "PB0"){ sRes = "Btn"; }            //  14       
+    else if(sP == "PB1"){ sRes = "Ctrl-RST"; }  //  15  
+    else if(sP == "PB2"){ sRes = "NC"; }        //  16
+    else if(sP == "PB3"){ sRes = "LCD-RS"; }    //  17
+    else if(sP == "PB4"){ sRes = "LCD-EN"; }    //  18
+    else if(sP == "PB5"){ sRes = "NC"; }        //  19
+    else if(sP == "PB6"){ sRes = "NC"; }        //   9         Não disponivel no arduino
+    else if(sP == "PB7"){ sRes = "NC"; }        //  10         Não disponível no arduino
+
+    // Pinos Analógicos
+    else if(sP == "PC0"){ sRes = "NC"; }   //  23        A0
+    else if(sP == "PC1"){ sRes = "NC"; }   //  24        A1
+    else if(sP == "PC2"){ sRes = "NC"; }   //  25        A2
+    else if(sP == "PC3"){ sRes = "NC"; }   //  26        A3
+    else if(sP == "PC4"){ sRes = "NC"; }   //  27        A4
+    else if(sP == "PC5"){ sRes = "NC"; }   //  28        A5
+    else if(sP == "PC6"){ sRes = "RST"; }  //  01        A6  RESET     
+    else if(sP == "PC7"){ sRes = "ND"; }   //            A7
+
+    else if(sP == "PD0"){ sRes = "RX"; }            //  02        RX
+    else if(sP == "PD1"){ sRes = "TX"; }            //  03        TX
+    else if(sP == "PD2"){ sRes = "EnBus-Loc"; }     //  04        
+    else if(sP == "PD3"){ sRes = "EnBus-Rem"; }     //  05
+    else if(sP == "PD4"){ sRes = "LCD-D7"; }        //  06
+    else if(sP == "PD5"){ sRes = "LCD-D6"; }        //  11
+    else if(sP == "PD6"){ sRes = "LCD-D5"; }        //  12
+    else if(sP == "PD7"){ sRes = "LCD-D4"; }        //  13  
+
+    else{ sRes = "Null"; }
+
+
+    return sRes;
+
+
+
+}
+
+
+void reset(){  
+   output_low(pin_B0); 
+   //delay_ms(1000);
+   //output_high(pin_B0);
+}
+
+
+void fixarBUS(int iBus){
+// Ctrl BUS de TX/RX, Local ou Remoto  
+
+    if(iBus == defBusLocal){ 
+        output_low(pin_B6);      // Pin(RB6) em Low habilita(Conecta) 74LS244 p/ conexão com Barramento - TX-Local Transmite
+        output_high(pin_B7);     // Pin(RB7) em high Desabilita(Abre) 74LS244 p/ conexão com Barramento - Abre-Bus TX Remoto
+        bBusLocalAtivo = true;
+    }else if(iBus == defBusRem){ 
+        output_high(pin_B6);    // Pin(RB6) em high Desabilita(Abre) 74LS244 p/ conexão com Barramento - Abre-Bus TX Local
+        output_low(pin_B7);     // Pin(RB7) em Low habilita(Conecta) 74LS244 p/ conexão com Barramento - TX-Remoto Transmite
+        bBusLocalAtivo = false;
+    }else{
+        output_low(pin_B6);      // Pin(RB6) em Low habilita(Conecta) 74LS244 p/ conexão com Barramento - TX-Local Transmite
+        output_high(pin_B7);     // Pin(RB7) em high Desabilita(Abre) 74LS244 p/ conexão com Barramento - Abre-Bus TX Remoto
+        
+        bBusLocalAtivo = true;
+    }
+
+
+}
+
+void help(){
+
+// Lista de comandos
+   char cHa[40]= "ShAdr, ShHdw, ShBuf,"; 
+   char cHb[40]= "Adr456, AdrF456, Clr456, ClrF, Rst456";
+   char cHc[40]= "RstF";
+/*  
+   //printf("\r\n%s%s#\r\n", cCI, cMyID);  
+   //for(int h=0; h<10; h++){  
+  // for(int hc=0; hc<25; hc++){ */
+      printf("\r\n%s%s# %s", cCI, cMyID, cHa);
+      printf("\n\r        %s", cHb);
+      printf("\n\r        %s\n\r", cHc);
+   //}}
+
+
+
+}
+
+

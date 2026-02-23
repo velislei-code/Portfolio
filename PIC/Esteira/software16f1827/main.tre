@@ -1,0 +1,75 @@
+ÀÄmain
+   ÀÄMAIN  0/321  Ram=3
+      ÃÄ@cinit1  (Inline)  Ram=0
+      ÃÄ@delay_ms2  0/21  Ram=1
+      ÃÄlcd_init  0/50  Ram=2
+      ³  ÃÄ@delay_ms1  0/22  Ram=1
+      ³  ÃÄlcd_send_nibble  0/12  Ram=1
+      ³  ÃÄ@delay_ms1  0/22  Ram=1
+      ³  ÃÄlcd_send_nibble  0/12  Ram=1
+      ³  ÃÄ@delay_ms1  0/22  Ram=1
+      ³  ÃÄ@const651  0/5  Ram=0
+      ³  ÀÄlcd_send_byte  0/64  Ram=3
+      ³     ÃÄlcd_read_byte  (Inline)  Ram=3
+      ³     ³  ÃÄlcd_read_nibble  0/6  Ram=0
+      ³     ³  ÀÄlcd_read_nibble  0/6  Ram=0
+      ³     ÃÄlcd_send_nibble  0/12  Ram=1
+      ³     ÀÄlcd_send_nibble  0/12  Ram=1
+      ÃÄ@PSTRINGC7_669  0/70  Ram=4
+      ³  ÃÄlcd_putc  0/44  Ram=1
+      ³  ³  ÃÄlcd_gotoxy  0/18  Ram=4
+      ³  ³  ³  ÀÄlcd_send_byte  0/64  Ram=3
+      ³  ³  ³     ÀÄ*
+      ³  ³  ÃÄlcd_send_byte  0/64  Ram=3
+      ³  ³  ³  ÀÄ*
+      ³  ³  ÃÄ@delay_ms1  0/22  Ram=1
+      ³  ³  ÃÄlcd_gotoxy  0/18  Ram=4
+      ³  ³  ³  ÀÄ*
+      ³  ³  ÃÄlcd_send_byte  0/64  Ram=3
+      ³  ³  ³  ÀÄ*
+      ³  ³  ÀÄlcd_send_byte  0/64  Ram=3
+      ³  ³     ÀÄ*
+      ³  ÀÄlcd_putc  0/44  Ram=1
+      ³     ÀÄ*
+      ÃÄ@delay_ms2  0/21  Ram=1
+      ÃÄVolts  0/82  Ram=2
+      ³  ÃÄmedias_volt  (Inline)  Ram=3
+      ³  ³  ÃÄlerPortaAdc  0/31  Ram=1
+      ³  ³  ÀÄ@DIV1616  0/37  Ram=5
+      ³  ÃÄ@MUL1616  (Inline)  Ram=5
+      ³  ÀÄ@DIV1616  0/37  Ram=5
+      ÃÄContaRpm  0/103  Ram=2
+      ³  ÃÄPulsoDetecte  (Inline)  Ram=1
+      ³  ÃÄ@DIV1616  0/37  Ram=5
+      ³  ÀÄ@ITOF  (Inline)  Ram=2
+      ÃÄlerPortaAdc  0/31  Ram=1
+      ÃÄ@delay_ms2  0/21  Ram=1
+      ÃÄlcd_putc  0/44  Ram=1
+      ³  ÀÄ*
+      ÃÄlcd_putc  0/44  Ram=1
+      ³  ÀÄ*
+      ÃÄ@PRINTF_LU_669  0/94  Ram=9
+      ³  ÀÄlcd_putc  0/44  Ram=1
+      ³     ÀÄ*
+      ÃÄ@PSTRINGCN7_669  0/77  Ram=5
+      ³  ÃÄlcd_putc  0/44  Ram=1
+      ³  ³  ÀÄ*
+      ³  ÀÄlcd_putc  0/44  Ram=1
+      ³     ÀÄ*
+      ÃÄ@PRINTF_LU_669  0/94  Ram=9
+      ³  ÀÄ*
+      ÃÄlcd_putc  0/44  Ram=1
+      ³  ÀÄ*
+      ÃÄ@PRINTF_LU_669  0/94  Ram=9
+      ³  ÀÄ*
+      ÃÄlcd_putc  0/44  Ram=1
+      ³  ÀÄ*
+      ÃÄ@PRINTF_LU_669  0/94  Ram=9
+      ³  ÀÄ*
+      ÃÄ@PSTRINGCN7_669  0/77  Ram=5
+      ³  ÀÄ*
+      ÃÄ@PRINTF_LU_669  0/94  Ram=9
+      ³  ÀÄ*
+      ÃÄ@PSTRINGCN7_669  0/77  Ram=5
+      ³  ÀÄ*
+      ÀÄ@delay_ms2  0/21  Ram=1

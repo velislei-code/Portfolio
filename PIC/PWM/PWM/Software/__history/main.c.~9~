@@ -1,0 +1,55 @@
+#include <main.h>
+
+#include <lcd.c>
+
+
+void main ()
+{
+  short current_duty_1 = 0; // valor inicial para current_duty_1
+  short current_duty_2 = 0; // valor inicial para current_duty_2
+
+  //TRISD = 0xFF; // PORTD como entrada
+  //TRISC = 0x00; // PORTC como saída
+
+  PWM1_Init (5000); // Inicializar PWM1
+  PWM2_Init (5000); // Inicializar PWM2
+
+  PWM1_Start (); // inicia PWM1
+  PWM2_Start (); // inicia PWM2
+
+  PWM1_Set_Duty (current_duty_1); // Define o serviço atual para PWM1
+  PWM2_Set_Duty (current_duty_2); // Define o serviço atual para PWM2
+
+  while (1) // loop infinito
+  {
+     if (! RD0_bit) // botão if em RD0 pressionado
+     {
+      Delay_ms (40);
+      current_duty_1 ++; // incrementar current_duty_1
+      PWM1_Set_Duty (current_duty_1); // Alterar o ciclo de trabalho
+     }
+
+    if (! RD1_bit) // botão em RD1 pressionado
+    {
+      Delay_ms (40);
+      current_duty_1--; // decrementar current_duty_1
+      PWM1_Set_Duty (current_duty_1);
+     }
+
+    if (! RD2_bit) // botão if em RD2 pressionado
+    {
+      Delay_ms (40);
+      current_duty_2 ++; // incrementar current_duty_2
+      PWM2_Set_Duty (current_duty_2);
+     }
+
+    if (! RD3_bit) // botão if no RD3 pressionado
+    {
+      Delay_ms (40);
+      current_duty_2--; // decrementar current_duty_2
+      PWM2_Set_Duty (current_duty_2);
+     }
+
+    Delay_ms (10); // diminua um pouco o ritmo de mudança
+  }
+}

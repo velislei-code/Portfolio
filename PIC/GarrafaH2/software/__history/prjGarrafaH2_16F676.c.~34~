@@ -1,0 +1,521 @@
+/*
+   Software de controle de eletrolise 
+      Temporiza
+      Inverte Polos
+      1 toque liga
+         toque apos acionado dobra tempos
+         
+         Incluir tempo Neutro entre inversao de Polos
+         Incluir Histerese no Botao
+         
+         
+         Se Off -> Segura Botao 3s >> ON
+         Se On -> Segura Botao 3s  >> Off
+               -> 1º toque rapido >> 50% a mais na eletrolise, pisca led verde lento
+               -> 2° toque rapido >> liga ctrl de H2, pisca Led amarelo, +50% a mais na eletrolise, pisca led verde rapido
+               -> 3° toque rapido >> Matem ligado ctrl de H2, pisca Led amarelo, desliga +50% a mais na eletrolise, pisca led verde rapido
+               -> 4º toque rapido >> delisga Ctrl de H2, apaga led
+               
+                     50%   | Ctrl H2
+               0     OFF   |   OFF
+               1     ON    |   OFF
+               2     ON    |   ON
+               3     OFF   |   ON
+               4     OFF   |   OFF
+               
+               
+
+
+*/
+
+#include <16F676.h>
+//#use delay(clock=4M)     // iAjuste em 15
+#USE DELAY (INTERNAL=4M)   // iAjuste em 3
+//#fuses HS, NOWDT, NOLVP  // Checar....16f1827 funciona, aki deu erro
+//#use standard_io(A)        // Ele "cuida" da direção dos pinos- ai a Dir fica defeinida por input ou output
+                             // A0 a A5 podem ser usadas como In ou Out, 
+//#use standard_io(B)        // B0 a B7 podem ser usadas como In ou Out                           
+                           
+/*
+#define LCD_ENABLE_PIN PIN_B0
+#define LCD_RS_PIN PIN_B1
+#define LCD_RW_PIN PIN_B2
+#define LCD_DATA4 PIN_B4
+#define LCD_DATA5 PIN_B5
+#define LCD_DATA6 PIN_B6
+#define LCD_DATA7 PIN_B7
+*/
+
+// #include <lcd.c>
+
+// Config pinos p/ PIC16F676, top eletronica, 15,00, ivan
+#define PIN_BTN PIN_A0           // Botao On/Off
+#define PIN_LED_AZ PIN_A1        // Led-Azul 
+#define PIN_BUZZER PIN_A2        // Buzzer
+#define PIN_LED_VD PIN_A4        // Led-Verde(outras funcoes)
+#define PIN_LED_VM PIN_A5       // Led-Vermelho(outras funcoes)
+#define PIN_TimeA pin_C0         // Jump de config Time - Combinacao das 2 forma 4 Tempos diferentes
+#define PIN_TimeB pin_C1         // Jump de config Time
+#define PIN_TimeC pin_C2         // Jump de config Time
+#define PIN_TimeD pin_C3         // Habilita Buzzer
+#define PIN_PteHx PIN_C4         // Ponte H(entrada esquerda)
+#define PIN_PteHy PIN_C5         // Ponte H(entrada direita)
+
+
+/*
+// Config pinos p/ PIC16F687
+#define PIN_LED_AZ PIN_A0        // Led-Azul 
+#define PIN_BUZZER PIN_A1        // Buzzer
+#define PIN_LED_VD PIN_A2        // Led-Verde(outras funcoes)
+#define PIN_PteHx PIN_B4         // Ponte H(entrada esquerda)
+#define PIN_PteHy PIN_B5         // Ponte H(entrada direita)
+#define PIN_BTN PIN_A5           // Botao On/Off
+#define PIN_TimeA pin_C0         // Jump de config Time - Combinacao das 2 forma 4 Tempos diferentes
+#define PIN_TimeB pin_C1         // Jump de config Time
+#define PIN_TimeC pin_C2         // Jump de config Time
+#define PIN_TimeD pin_C3         // Habilita Buzzer
+
+/*
+// Config pinos p/ PIC16F1827
+#define PIN_LED pin_A0           // Led
+#define PIN_BUZZER pin_A1        // Buzzer
+#define PIN_PteHx pin_B0         // Ponte H(entrada esquerda)
+#define PIN_PteHy pin_B1         // Ponte H(entrada direita)
+#define PIN_BTN pin_B2           // Botao On/Off
+#define PIN_TimeA pin_B6         // Jump de config Time - Combinacao das 2 forma 4 Tempos diferentes
+#define PIN_TimeB pin_B7         // Jump de config Time
+*/
+
+
+#define Minuto 0
+#define Hora 1
+#define Down 0
+#define Up 1
+#define Nula 2
+#define Nao 0
+#define Sim 1
+#define Off 0
+#define On 1
+#define LED_AZ 0
+#define LED_VD 1
+#define LED_VM 2
+
+void Clock_PIC();
+void zerarClock();
+void checkPressBtn(int iT);
+void checkBordaUpBtn();                         // Nao esta em uso
+void buzzer(int iN, int iT);                    // Aciona Buzzer(n.Beeps, Tempo em ms)
+void piscaLED(int iN, int iT, int iQual);      
+
+void inicializar();        // Inicia variaveis
+void Start();              // Inicia Ciclo
+void Stop();               // Para Ciclo
+
+void PoloPN();            // Eletrodos +/-
+void PoloNP();            // Eletrodos -/+
+void Aterrar();           // Eletrodos -/-
+
+int iDecSeg = 0;
+int iSeg = 0;
+int iMin = 0;
+
+int iCircuito = Off;       // Ctrl estado atual do circuito: On(1)/Off(0)
+int iBtnPress = 0;         // Ctrl o pressionamento do Btn On/Off
+int iStartCiclo = Nao;     // Ctrl/limita somente 1 start em ciclo p/ evitar descontrole
+int iTempo = 6;
+int iHabExecPoloNP = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas
+int iHabExecPoloPN = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas
+int iGerandoH2 = Nao;      // Ctrl pisca Led(durante Geracao de H2, eletrodos ativos) 
+//char cMsg = '!';
+int iModoEspera = Nao;     // Ctrl aviso discreto de p/ evitar esquecer - após H2 finalizado
+int iTimePressBtn=0;       // Memoriza tempo de Press Botao
+int iAcrecimo50 = Nao;     // Acrecimo de 50% na eletrolise
+int iHabCtrlH2 = Nao;      // Ctrl o H2, refazendo eletrolise a cada X Horas
+int iPosBtn = 0;           // Ctrl posicao de cmd do botao, 0, 1(liga 50%), 2(liga Ctrl h2)...
+
+#INT_TIMER1
+void interrupt()
+{   
+  // output_toggle(PIN_A0);     
+   set_timer1(0x9e58);   
+   Clock_PIC();   // Faz contagem dos tempos hh:mm:ss
+
+}
+
+void main()
+{
+   setup_timer_1 (T1_INTERNAL | T1_DIV_BY_4);            // p/ Clock de 4Mhz
+   set_timer1(0x9e58);                                   // 100ms
+   enable_interrupts(INT_TIMER1);
+   enable_interrupts(GLOBAL);
+
+   
+ //  lcd_init();
+  // printf(lcd_putc,"\f Circuito H2");       // imprimir no lcd (\f limpa o lcd)
+   delay_ms(50);     // atualiza??o de tela a cada X ms
+   
+ 
+   inicializar();
+   Aterrar();           // Aterrar eletrodos(-/-)
+   
+   while(TRUE)
+   {
+         // Faz leitura das config das Dips - 5(PN) + 5(NP) = 10           
+        if( (input(PIN_TimeA) == 0)&&(input(PIN_TimeB) == 0) ){ iTempo = 3;   }
+        else if( (input(PIN_TimeA) == 0)&&(input(PIN_TimeB) == 1) ){ iTempo = 5;   }
+        else if( (input(PIN_TimeA) == 1)&&(input(PIN_TimeB) == 0) ){ iTempo = 7;   }
+        else if( (input(PIN_TimeA) == 1)&&(input(PIN_TimeB) == 1) ){ iTempo = 10;   }
+        else{ iTempo = 5;   } 
+        
+         // printf(lcd_putc,"\f Clock_PIC");       // imprimir no lcd (\f limpa o lcd)  
+        
+   //     printf(lcd_putc,"\f %d:%d:%d - %c \n\r  On: %d", iMin, iSeg, iDecSeg, cMsg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd)
+         
+         
+      
+     
+      checkPressBtn(10);
+     
+      
+      if( (iCircuito == On)&&(iGerandoH2==Nao) ){   
+            Start();  
+            checkBordaUpBtn();
+       }else{
+            Stop();            
+       }
+       
+       
+       delay_ms(100);
+       
+   }  // While
+
+}
+
+void inicializar(){
+
+      iDecSeg = 0;
+      iSeg = 0;
+      iMin = 0;
+      
+      iCircuito = Off;       // Ctrl estado atual do circuito: On(1)/Off(0)
+      iBtnPress = Nao;         // Ctrl o pressionamento do Btn On/Off
+      iStartCiclo = Nao;     // Ctrl/limita somente 1 start em ciclo p/ evitar descontrole
+      iTempo = 5;
+      iHabExecPoloNP = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas
+      iHabExecPoloPN = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas
+     // cMsg = '!';
+      iModoEspera = Nao;    // Ctrl aviso discreto de p/ evitar esquecer - após H2 finalizado
+     
+}
+
+void Clock_PIC(){
+// Faz ctrl de seg, min, hr
+       
+      if(iDecSeg > 9){
+         iDecSeg = 0;
+         iSeg++;
+         if(iGerandoH2 == Sim){ piscaLed(1, 500, LED_AZ); }   
+         //if( (input(PIN_TimeD) == Sim)){ piscaLed(1, 500, LED_VD);  piscaLed(1, 500, LED_VM);}   // teste saida C
+      }
+      
+      if(iSeg > 59){
+         iDecSeg = 0;
+         iSeg = 0;
+         iMin++;
+      }
+      
+      if(iMin > 59){
+         iDecSeg = 0;
+         iSeg = 0;
+         iMin = 0;        
+         
+      }
+      
+      // INicio de tratamento de processos
+      if(iCircuito == On){
+         
+         if(iSeg < iTempo){
+             PoloPN();   
+             delay_ms(10);
+             break;  
+               
+         }
+         else if( (iSeg > iTempo)&&(iSeg < iTempo*2) ){ 
+         
+             PoloNP();  
+             delay_ms(10);
+             break;    
+         }
+         else if( (iSeg > iTempo*2)&&(iSeg < iTempo*3) ){ 
+         
+             buzzer(3, 100);            // Aciona Buzzer(3beep de 100ms), aviso de finalizacao
+             Stop();
+             iModoEspera = Sim;         // H2 finalizado, Habilita aviso anti-esquecimento
+             zerarClock();
+             break;
+         }
+         else if(iSeg > iTempo*3){ 
+         
+            Stop();
+             break;   
+        }
+         
+      }else{
+          Stop();
+          break;      
+      }
+      
+      // Caso H2 tenha finalizado...aciona aviso de modo espera
+      if( (iModoEspera == Sim)&&(iCircuito == Off)){
+         if(iSeg > iTempo){    
+            buzzer(2, 50);       // aciona buzzer (1beep de 50ms)
+            zerarClock();
+         }
+      }
+      
+  
+      iDecSeg++;  // Incrementa DecSegundos
+      
+}
+
+void zerarClock(){
+
+      iDecSeg = 0;
+      iSeg = 0;
+      iMin = 0; 
+}
+
+
+void PoloPN(){
+
+      if(iHabExecPoloPN == Sim){  // Condicao evita exec.varias vezes no mesmo ciclo, o q estava causanso inversão continua
+      
+        output_high(PIN_LED_AZ);     // Led Azul (H2 acionado)   
+        output_low(PIN_PteHx);      // Polos (+/-)
+        output_high(PIN_PteHy);  
+        iHabExecPoloPN = Nao;     // Como ja exec.neste ciclo, bloqueia nova exec.
+        
+     //   printf(lcd_putc,"\f %d:%d:%d - Pn \n\r On: %d", iMin, iSeg, iDecSeg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd)
+       // cMsg = 'P';
+        delay_ms(50);
+      }
+}
+
+void PoloNP(){
+
+    if(iHabExecPoloNP == Sim){    // Condicao evita exec.varias vezes no mesmo ciclo, o q estava causanso inversão continua
+        output_high(PIN_LED_AZ);     // Led Azul (H2 acionado)   
+        output_high(PIN_PteHx);     // Polos (-/+)
+        output_low(PIN_PteHy);  
+        iHabExecPoloNP = Nao;     // Como ja exec.neste ciclo, bloqueia nova exec.
+        
+     //   printf(lcd_putc,"\f %d:%d:%d - Np \n\r On: %d", iMin, iSeg, iDecSeg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd)
+       // cMsg = 'N';
+        delay_ms(50);
+    }
+}
+
+void Aterrar(){
+      
+     output_high(PIN_PteHx);     // 2 eletrodos ao Negativo (-/-)
+     output_high(PIN_PteHy);  
+     iHabExecPoloNP = Sim;     // Habilita Exec.da funcao
+     iHabExecPoloPN = Sim;
+     
+    // printf(lcd_putc,"\f %d:%d:%d - ATR \n\r On: %d", iMin, iSeg, iDecSeg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd)
+     //cMsg = 'A';
+     delay_ms(50);
+}
+
+void Start(){
+   
+     output_high(PIN_LED_AZ);    // Led Azul (H2 acionado)  
+     output_high(PIN_LED_VD);    // Led Verde - tst (H2 acionado)  
+     
+     PoloPN();  
+     iGerandoH2 = Sim;         // Habilita Piscar-Led durante geracao H2
+        
+     if(iStartCiclo == Sim){        // Condicao evita que exec.continuamente - assim exec.somente 1x
+         
+         iStartCiclo = Nao;         // Bloqueia novo start p/ este ciclo
+         iDecSeg = 0;
+         iSeg = 0;
+         iMin = 0;
+      }
+     
+}
+
+void Stop(){
+
+     
+      Aterrar();
+      iGerandoH2 = Nao;             // Desabilita Piscar-Led durante geracao H2 
+      iCircuito = Off;
+      
+       if(iStartCiclo == Nao){      // Condicao evita que exec.continuamente - assim exec.somente 1x
+            iStartCiclo = Sim;      // Libera novo start p/ este ciclo
+       }
+      if(iModoEspera == Sim){         
+          output_high(PIN_LED_AZ);
+      }else{
+          output_low(PIN_LED_AZ);   // Led Azul (H2 desligado)  
+      }
+       output_low(PIN_LED_VD);      // Led verde-teste (H2 acionado)  
+     
+}
+
+
+void buzzer(int iN, int iT){
+ // Ativa Buzzzer - Avisa finalizacao dos ciclos com 3 Bips
+      for(int bz=0; bz<iN; bz++){
+         output_high(PIN_BUZZER);    // Buzzer (H2 acionado)
+         delay_ms(iT);
+         output_low(PIN_BUZZER);    // Buzzer (H2 acionado)
+         delay_ms(iT);
+      }
+
+}
+
+void piscaLED(int iN, int iT, int iQual){
+// Pisca Led durante Geraracao de H2
+      for(int p=0; p<iN; p++){
+         if(iQual == LED_AZ){ output_high(PIN_LED_AZ);   }
+         else if(iQual == LED_VD){ output_high(PIN_LED_VD);  }
+         else if(iQual == LED_VM){ output_high(PIN_LED_VM);  }
+         else{ output_high(PIN_LED_AZ);   }
+         delay_ms(iT);
+         if(iQual == LED_AZ){ output_low(PIN_LED_AZ);   }
+         else if(iQual == LED_VD){ output_low(PIN_LED_VD);  }
+         else if(iQual == LED_VM){ output_low(PIN_LED_VM);  }
+         else{ output_low(PIN_LED_AZ);   }
+         delay_ms(iT);
+      }
+}
+
+void checkPressBtn(int iT){
+// Cria histerese no botao p/ acionar circuito
+
+   if(input(PIN_BTN) == 1){
+      if(iTimePressBtn >= iT){
+         
+      
+            // caso Circuito esteja em modo espera(H2 pronto), o pressionar do botão somente tira de modo espera, 1 segundo pressionar vai ligar o circuito
+           if(iModoEspera == Sim){  
+               iModoEspera = Nao;      // Tira de modo espera
+               buzzer(2, 50);          // Avisa que recebeu cmd
+           }else{
+               if(iCircuito == On){ iCircuito = Off; }
+               else if(iCircuito == Off){ iCircuito = On; }
+               buzzer(1,50);              // Bip de teclado       ...entrando direto aqui
+           }
+            iTimePressBtn=0;
+            
+      }
+      iTimePressBtn++;
+   
+   }else{
+      iBtnPress == Nao;
+      iTimePressBtn=0;
+   }
+
+
+
+
+}
+
+void checkBordaUpBtn(){
+   // Verifica se botao foi solto(presenca de borda de subida)
+   
+      int iBorda = Nula;
+   
+      if( (iBtnPress == Nao)&&(input(PIN_BTN) == 0) ){  iBorda = Nula; iBtnPress = 0;}
+      else if( (iBtnPress == Nao)&&(input(PIN_BTN) == 1) ){ iBorda = Down; iBtnPress = 1; }
+      else if( (iBtnPress == Sim)&&(input(PIN_BTN) == 0) ){ iBorda = Up; iBtnPress = 0; }          // Detectado Borda de subida aqui
+      else if( (iBtnPress == Sim)&&(input(PIN_BTN) == 1) ){ iBorda = Down;  iBtnPress = 1;}
+      else{ iBorda = Nula; iBtnPress = 0; }
+      
+      
+      if( iBorda == Up ){   
+      
+               buzzer(10,500);              // Bip de teclado
+       
+               if(iCircuito == On){ 
+                  if(iPosBtn == 0){ 
+                     output_high(PIN_LED_VD);
+                     output_low(PIN_LED_VM);
+                     iAcrecimo50 = Sim;     // Acrecimo de 50% na eletrolise
+                     iHabCtrlH2 = Nao;      // Ctrl o H2, refazendo eletrolise a cada X Horas       
+                     break;
+                  }else if(iPosBtn == 1){ 
+                     output_high(PIN_LED_VD);
+                     output_high(PIN_LED_VM);
+                     iAcrecimo50 = Sim;     // Acrecimo de 50% na eletrolise
+                     iHabCtrlH2 = Sim;      // Ctrl o H2, refazendo eletrolise a cada X Horas       
+                     break;
+                  }else if(iPosBtn == 2){ 
+                     output_low(PIN_LED_VD);
+                     output_high(PIN_LED_VM);
+                     iAcrecimo50 = Nao;     // Acrecimo de 50% na eletrolise
+                     iHabCtrlH2 = Sim;      // Ctrl o H2, refazendo eletrolise a cada X Horas       
+                     break;
+                  }else if(iPosBtn == 3){ 
+                     output_low(PIN_LED_VD);
+                     output_low(PIN_LED_VM);
+                     iAcrecimo50 = Nao;     // Acrecimo de 50% na eletrolise
+                     iHabCtrlH2 = Nao;      // Ctrl o H2, refazendo eletrolise a cada X Horas       
+                     break;
+                  }else{ 
+                     output_low(PIN_LED_VD);
+                     output_low(PIN_LED_VM);
+                     iAcrecimo50 = Nao;     // Acrecimo de 50% na eletrolise
+                     iHabCtrlH2 = Nao;      // Ctrl o H2, refazendo eletrolise a cada X Horas       
+                     break;
+                  }
+                  iPosBtn++;
+                  if(iPosBtn >3){ iPosBtn = 0; }
+                  buzzer(1,500);              // Bip de teclado
+                   
+               }else{
+                     output_low(PIN_LED_VD);
+                     output_low(PIN_LED_VM);
+                     iAcrecimo50 = Nao;     // Acrecimo de 50% na eletrolise
+                     iHabCtrlH2 = Nao;      // Ctrl o H2, refazendo eletrolise a cada X Horas       
+                     break;
+                  }
+              
+         
+      }
+       
+     
+}
+
+/* Original
+void checkBordaUpBtn(){
+   // Verifica se botao foi solto(presenca de borda de subida)
+   
+      int iBorda = Nula;
+   
+      if( (iBtnPress == Nao)&&(input(PIN_BTN) == 0) ){  iBorda = Nula; iBtnPress = 0;}
+      else if( (iBtnPress == Nao)&&(input(PIN_BTN) == 1) ){ iBorda = Down; iBtnPress = 1; }
+      else if( (iBtnPress == Sim)&&(input(PIN_BTN) == 0) ){ iBorda = Up; iBtnPress = 0; }          // Detectado Borda de subida aqui
+      else if( (iBtnPress == Sim)&&(input(PIN_BTN) == 1) ){ iBorda = Down;  iBtnPress = 1;}
+      else{ iBorda = Nula; iBtnPress = 0; }
+      
+      
+      if( iBorda == Up ){   
+      
+            // caso Circuito esteja em modo espera(H2 pronto), o pressionar do botão somente tira de modo espera, 1 segundo pressionar vai ligar o circuito
+           if(iModoEspera == Sim){  
+                  iModoEspera = Nao;      // Tira de modo espera
+                  buzzer(2, 50);          // Avisa que recebeu cmd
+           }else{
+               if(iCircuito == On){ iCircuito = Off; }
+               else if(iCircuito == Off){ iCircuito = On; }
+           }
+      }
+       
+     
+}
+*/
+
+

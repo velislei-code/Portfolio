@@ -1,0 +1,19 @@
+[PROJECT]
+Target=rpm.hex
+Processor_Text=PIC16F1827
+CCSVersion=5.008
+Compiler=PCM
+[Target Data]
+FileList=rpm.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[rpm.c]
+Type=4
+[mru-list]
+1=rpm.c
+[Opened Files]
+1=rpm.c
+2=
+[Units]
+Count=1
+1=rpm (main)

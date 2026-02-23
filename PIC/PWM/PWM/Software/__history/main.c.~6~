@@ -1,0 +1,173 @@
+#include <main.h>
+
+#include <lcd.c>
+
+
+//Habilitar as seguintes bibliotecas:
+// - ADC
+
+//MCU: PIC16F877A
+//CLOCK: 16MHz
+
+sbit PWM1_Channel at RB0_Bit;
+sbit PWM2_Channel at RB1_Bit;
+sbit PWM3_Channel at RB2_Bit;
+sbit PWM1_Channel_Dir at TRISB0_Bit;
+sbit PWM2_Channel_Dir at TRISB1_Bit;
+sbit PWM3_Channel_Dir at TRISB2_Bit;
+
+
+/*********************************************************************************************************/
+typedef struct
+{
+        union 
+        {
+           char EN:1;        //Habilita/Desabilita
+           char INV:1;       //Inverter
+           char:6;
+           char DC:8;       //Duty Cycle
+        };
+} PWM;
+
+PWM PWM1 absolute 0x22;
+PWM PWM2 absolute 0x24;
+PWM PWM3 absolute 0x26;
+
+
+/*********************************************************************************************************/
+//Copie e cole o código da biblioteca aqui!!!
+unsigned Timer1 at TMR1L;
+
+typedef struct
+{
+        union 
+        {
+           char EN:1;        //Enable
+           char INV:1;       //Inverse
+           char:6;
+           char DC:8;       //Duty Cycle
+        };
+} PWM;
+
+PWM PWM1 absolute 0x22;
+PWM PWM2 absolute 0x24;
+PWM PWM3 absolute 0x26;
+
+void Soft_PWM_Init()
+{
+    PWM1_Channel_Dir = 0;
+    PWM2_Channel_Dir = 0;
+    PWM3_Channel_Dir = 0;
+    PWM1_Channel = 0;
+    PWM2_Channel = 0;
+    PWM3_Channel = 0;
+    
+    
+    PWM1.EN = 0;
+    PWM2.EN = 0;
+    PWM3.EN = 0;
+    PWM1.INV = 0;
+    PWM2.INV = 0;
+    PWM3.INV = 0;
+    PWM1.DC = 127;
+    PWM2.DC = 127;
+    PWM3.DC = 127;
+    
+    T1CON = 1;
+    Timer1 = 0xFF38;
+    TMR1IE_Bit = 1;
+    GIE_Bit = 1;
+    PEIE_Bit = 1;
+}
+
+void Soft_PWM_Start( char channel )
+{
+     ((PWM*)&PWM1)[channel].EN = 1;
+}
+
+void Soft_PWM_Stop( char channel )
+{
+     ((PWM*)&PWM1)[channel].EN = 0;
+}
+
+void Soft_PWM_Set_Duty( char channel, char DutyCycle )
+{
+     ((PWM*)&PWM1)[channel].DC = DutyCycle;
+}
+
+void Interrupt()
+{
+static unsigned count = 0;
+    if( TMR1IF_Bit )
+    {
+        TMR1IF_Bit = 0;
+        Timer1 = 0xFF38;
+        count++;
+        
+        if( PWM1.EN )
+        {
+           if( count == PWM1.DC )
+           {
+               PWM1_Channel = !PWM1.INV;
+           }
+           else if( count > 255 )
+           {
+               PWM1_Channel = PWM1.INV;
+           }
+        }
+        
+        if( PWM2.EN )
+        {
+           if( count == PWM2.DC )
+           {
+               PWM2_Channel = !PWM2.INV;
+           }
+           else if( count > 255 )
+           {
+               PWM2_Channel = PWM2.INV;
+           }
+        }
+        
+        if( PWM3.EN )
+        {
+           if( count == PWM3.DC )
+           {
+               PWM3_Channel = !PWM3.INV;
+           }
+           else if( count > 255 )
+           {
+               PWM3_Channel = PWM3.INV;
+           }
+        }
+        
+       count &= 0xFF;
+    }
+}
+
+
+
+/*********************************************************************************************************/
+
+void main()
+{
+char i;
+    CMCON = 7;
+    
+    ADC_Init();
+    
+    Soft_PWM_Init();
+    Soft_PWM_Set_Duty( 0, 90 );
+    Soft_PWM_Set_Duty( 1, 100 );
+    Soft_PWM_Set_Duty( 2, 200 );
+    Soft_PWM_Start( 0 );
+    Soft_PWM_Start( 1 );
+    Soft_PWM_Start( 2 );
+    
+    while(1)
+    {
+        for( i = 0; i < 3; i++ )
+        {
+           Soft_PWM_Set_Duty( i, ADC_Get_Sample(i) >> 2 );
+        }
+    }
+}

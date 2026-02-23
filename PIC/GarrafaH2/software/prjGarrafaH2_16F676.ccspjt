@@ -1,0 +1,22 @@
+[PROJECT]
+Target=prjGarrafaH2_16F676.hex
+Processor_Text=PIC16F676
+CCSVersion=5.008
+Compiler=PCM
+[Target Data]
+FileList=prjGarrafaH2_16F676.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[prjGarrafaH2_16F676.c]
+Type=4
+[mru-list]
+1=prjGarrafaH2_16F676.c
+[Opened Files]
+1=prjGarrafaH2_16F676.c
+2=C:\Users\velis\AppData\Local\Temp\Rar$DIa0.272\read_touch.c
+3=C:\Users\velis\AppData\Local\Temp\Rar$DIa0.439\read_touch.h
+4=C:\Users\velis\AppData\Local\Temp\Rar$DIa0.462\touch_sw_mcu.c
+5=
+[Units]
+Count=1
+1=prjGarrafaH2_16F676 (main)

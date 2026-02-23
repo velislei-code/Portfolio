@@ -1,0 +1,47 @@
+#include <main.h>
+
+#include <lcd.c>
+
+int16 analogico;     // var para pegar 10bits(0-1023) da entrada analogica
+int16 Volts();
+
+void main()
+{
+   setup_adc_ports(sAN0);
+   setup_adc(ADC_CLOCK_INTERNAL);
+
+   lcd_init();
+   
+    printf(lcd_putc,"\f Voltimetro PIC");       // imprimir no lcd (\f limpa o lcd)
+    delay_ms(50);     // atualização de tela a cada X ms
+    
+
+   while(TRUE)
+   {
+       set_adc_channel(0);           // Config qual entrada analogica sera lida
+      delay_us(10);                 // tempo para seleção
+      //analogico = read_adc();       // leitura da entrada analogica
+      
+    
+      printf(lcd_putc,"\f %lu \n \r",volts());       // imprimir no lcd (\f limpa o lcd)
+      delay_ms(50);     // atualização de tela a cada X ms
+    
+      
+   }
+
+}
+
+ int16 volts() {
+      
+      analogico = read_adc();                    // leitura da entrada analogica
+      int16 t_Volts = (analogico*40)/1023;      // 400 = 40.0 Volt(tensão máx, com 1 decimal) - Converte valor para Volts(1023 Resolução de 10 bits do conversor AD) 
+   
+      /* caso se tenha um Voltímetro até 60V:
+       * Reprojetar o divisor de tensão p/ 60V
+       * Alterar calc para:
+       * t_Volts = (store*600)/1023;      
+       */
+   
+      return(t_Volts);
+      
+   }

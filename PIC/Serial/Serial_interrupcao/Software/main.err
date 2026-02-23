@@ -1,0 +1,5 @@
+>>> Warning 202 "main.c" Line 11(9,23): Variable never used:   bBusLocalAtivo
+>>> Warning 202 "main.c" Line 66(8,16): Variable never used:   cRetorna
+      Memory usage:   ROM=9%      RAM=7% - 15%
+      0 Errors,  2 Warnings.
+Build Successful.

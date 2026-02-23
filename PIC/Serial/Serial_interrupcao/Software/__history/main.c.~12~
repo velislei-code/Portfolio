@@ -1,0 +1,94 @@
+#include <main.h>
+#INT_RDA
+
+
+// ----- Declara Var´s----------------------------------------------------------
+int iDigNum;                  // Conta num de char-RX
+char cLinComRX[10];  // Armazena linha de comunicação serial 
+                              // Linhas sempre se formaram de #(Inicio), Msg, ;(fim)
+boolean bResponder;              // Ctrl responder ou não
+boolean bBusLocalAtivo;
+char cMyID[5];
+
+
+
+void lerPortaCom(int iPorta);
+
+
+
+void  RDA_isr(void) 
+{
+// Toda vez q o PIC receber algum dado da serial, ele interrompe o programa(while) e
+// vem aqui(se tiver num delay, sai do delay, exec.aqui e volta pro while
+   /*
+   cRX = getc();     // Recebe na porta Serial
+   
+   if(cRX == 'a') { 
+      output_high(pin_b0);
+      printf("Char a: Acende!\n\r");   // TX na porta serial
+     
+   }        // Liga pino
+   if(cRX == 'b') { 
+      output_low(pin_b0);  
+      printf("Char b: Apaga!\n\r");
+   }         // Desliga pino
+   */
+   
+   lerPortaCom(0);
+}
+
+void main()
+{
+
+   enable_interrupts(INT_RDA);
+   enable_interrupts(GLOBAL);
+
+   while(TRUE)
+   {
+      //TODO: User Code      
+      output_toggle(pin_b7);
+      delay_ms(1000);
+      
+      
+   }
+
+}
+
+
+void lerPortaCom(int iPorta){
+
+  char cRetorna[10];
+  
+   printf(">>P0"); 
+   
+  char cRX = getc();     // Recebe na porta Serial
+   
+          if(cRX == '['){
+          //  limpaLinhaRX();           // Limpa Var com Lina de ComRX
+            iDigNum = 0;              // Char indicativo inicio de linha-Com 
+            printf(">>P1"); 
+          }      
+
+          if( (cRX != '[')&&(cRX != ']') ){     // Se Char de Inicio e fim de linha, monta a linhaCo
+              //if(!isDigit(cRX)){
+                cRX = cRX & ~(0x20);            // Se NÃO for numero...char.toUppercase
+                  printf(">>P2"); 
+              //}
+              cLinComRX[iDigNum] = cRX;       // Monta Linha
+              iDigNum++;                      // Incrementa digto da linha
+          }
+
+          if(cRX == ']'){                     // Se for fim de linha...imprime no lcd
+              bResponder = true;
+                 printf(">>P3"); 
+              char cRxCmd = "Cmd();"; Comando(cLinComRX);   
+              if(bResponder){
+             
+                  bResponder = false;       // Bloqueia p/ evitar resposta repetida                
+                  printf("\n\rID" + cMyID +"> " + cRxCmd); 
+               
+              }
+          }
+ 
+}
+

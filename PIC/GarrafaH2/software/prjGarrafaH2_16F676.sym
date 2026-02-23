@@ -1,0 +1,101 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+019.6   C1OUT
+020     @SCRATCH
+021     @SCRATCH
+021     _RETURN_
+022     @SCRATCH
+023     @SCRATCH
+024     @INTERRUPT_AREA
+025     @INTERRUPT_AREA
+026     @INTERRUPT_AREA
+027     @INTERRUPT_AREA
+028     @INTERRUPT_AREA
+029     @INTERRUPT_AREA
+02A     @INTERRUPT_AREA
+02B     @INTERRUPT_AREA
+02C     @INTERRUPT_AREA
+02D     iDecSeg
+02E     iSeg
+02F     iMin
+030     iCircuito
+031     iBtnPress
+032     iStartCiclo
+033     iTempo
+034     iHabExecPoloNP
+035     iHabExecPoloPN
+036     iGerandoH2
+037     iModoEspera
+038     iTimePressBtn
+039     iAcrecimo50
+03A     iHabCtrlH2
+03B     iPosBtn
+03C     iBtnOcupado
+03D     checkBordaUpBtn.iBorda
+03D     checkPressBtn.iT
+03D     MAIN.@SCRATCH1
+03E     MAIN.@SCRATCH2
+03E     checkPressBtn.@SCRATCH1
+03E     checkBordaUpBtn.@SCRATCH1
+042     @MUL88.P1
+042     buzzer.iN
+042     piscaLED.iN
+043     piscaLED.iT
+043     buzzer.iT
+043     @MUL88.P1
+044     buzzer.bz
+044     piscaLED.iQual
+045     piscaLED.p
+046     @delay_ms1.P1
+09B-09C @READ_PROGRAM_MEMORY8.P1
+
+ROM Allocation:
+00003E  @delay_ms1
+000052  piscaLED
+000098  PoloPN
+0000A7  @MUL88
+0000CC  buzzer
+0000E2  Aterrar
+0000F1  Stop
+000105  zerarClock
+000109  interrupt
+00010E  Clock_PIC
+00014C  PoloNP
+000198  inicializar
+0001A5  checkPressBtn
+0001DE  Start
+0001EE  checkBordaUpBtn
+000224  @cinit1
+000224  MAIN
+000240  @cinit2
+
+Project Directory:
+    D:\Projetos\PIC\GarrafaH2\software\
+
+Project Files:
+    prjGarrafaH2_16F676.c                                   [01-out-22 10:27  CRC=BAA24107]
+    C:\Program Files (x86)\PICC\Devices\16F676.h            [03-jul-13 14:28  CRC=1E9E6C33]
+
+Source signature=F7DF196D
+
+Units:
+    prjGarrafaH2_16F676 (main)
+
+Compiler Settings:
+    Processor:      PIC16F676
+    Pointer Size:   8
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   prjGarrafaH2_16F676.xsym
+    Errors:      prjGarrafaH2_16F676.err
+    Ext Symbols: prjGarrafaH2_16F676.esym
+    INHX8:       prjGarrafaH2_16F676.hex
+    Symbols:     prjGarrafaH2_16F676.sym
+    List:        prjGarrafaH2_16F676.lst
+    Debug/COFF:  prjGarrafaH2_16F676.cof
+    Project:     prjGarrafaH2_16F676.ccspjt
+    Call Tree:   prjGarrafaH2_16F676.tre
+    Statistics:  prjGarrafaH2_16F676.STA

@@ -1,0 +1,17 @@
+#include <main.h>
+
+#include <lcd.c>
+
+void main()
+{
+	setup_adc_ports(sAN0);
+	setup_adc(ADC_CLOCK_INTERNAL);
+
+   lcd_init();
+
+	while(TRUE)
+	{
+		//TODO: User Code
+	}
+
+}

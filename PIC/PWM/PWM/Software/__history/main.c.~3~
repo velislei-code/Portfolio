@@ -1,0 +1,25 @@
+#include <main.h>
+
+#include <lcd.c>
+
+
+void main()
+{
+      setup_adc_ports(sAN0);
+      setup_adc(ADC_CLOCK_INTERNAL);
+
+      lcd_init();
+      
+      int duty,b;
+      //trisc=0;
+      //adcon1=0b00000000; // Configure AN pins as digital I/O
+      while(1)
+       {
+          duty=adc_read(0)/102.3;
+          b=10-duty;
+          portc.rc2=1;
+          vdelay_ms(duty);
+          portc.rc2=0;
+          vdelay_ms(b);
+       }
+}

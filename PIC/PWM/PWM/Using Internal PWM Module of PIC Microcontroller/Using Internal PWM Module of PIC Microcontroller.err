@@ -1,0 +1,17 @@
+*** Error 99 "Using Internal PWM Module of PIC Microcontroller.c" Line 4(5,9): Option invalid   No PWM pin specified
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 14(12,13): Undefined identifier  -- PWM1_Init
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 15(12,13): Undefined identifier  -- PWM2_Init
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 17(13,14): Undefined identifier  -- PWM1_Start
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 18(13,14): Undefined identifier  -- PWM2_Start
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 20(16,17): Undefined identifier  -- PWM1_Set_Duty
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 21(16,17): Undefined identifier  -- PWM2_Set_Duty
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 25(11,18): Undefined identifier   RD0_bit
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 29(20,21): Undefined identifier  -- PWM1_Set_Duty
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 32(10,17): Undefined identifier   RD1_bit
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 36(20,21): Undefined identifier  -- PWM1_Set_Duty
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 39(10,17): Undefined identifier   RD2_bit
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 43(20,21): Undefined identifier  -- PWM2_Set_Duty
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 46(10,17): Undefined identifier   RD3_bit
+*** Error 12 "Using Internal PWM Module of PIC Microcontroller.c" Line 50(20,21): Undefined identifier  -- PWM2_Set_Duty
+      15 Errors,  0 Warnings.
+Build Failed.

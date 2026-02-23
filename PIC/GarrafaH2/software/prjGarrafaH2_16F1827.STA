@@ -1,0 +1,61 @@
+
+ROM used:   581/4096 (14%)
+            581/4096 (14%) including unused fragments
+
+            0.5 Average locations per line
+            3.3 Average locations per statement
+
+RAM used:   22/383 (6%) at main() level
+            40/383 (10%) worst case
+
+Stack used: 7 worst case (3 in main + 4 for interrupts)
+Stack size: 16
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  354   178 100  prjGarrafaH2_16F1827.c
+  881     0   0  C:\Program Files (x86)\PICC\Devices\16F1827.h
+----- -----
+ 1235   178 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     22   4    1             @delay_ms1
+0    155  27    0    27  0.9  interrupt
+0    134  23    2   874  4.8  MAIN
+0     14   2    0   197  1.8  inicializar
+ Inline         0  1237  6.8  Clock_PIC
+0     37   6    2    50  1.5  @MUL88
+0      4   1    0    50  1.5  zerarClock
+0     20   3    0   121  2.6  PoloPN
+ Inline         0   121  2.6  PoloNP
+0     16   3    0    88  1.7  Aterrar
+0     22   4    0   158  2.6  Start
+0     22   4    0   179  3.1  Stop
+0     24   4    2   174  4.0  buzzer
+ Inline         2   174  4.0  piscaLED
+0     79  14    2   941  4.4  check_PressBtn
+ Inline         0             @cinit1
+
+Program metrics:
+    Functions               14
+    Statements              178
+    Comments                237
+    Volume (V)              6976
+    Difficulty (D)          43.0
+    Effort to implement (E) 299936
+    Time to implement (T)   4 hours, 38 minutes
+    Est Delivered Bugs (B)  1
+    Cyclomatic Complexity   31
+    Maintainability (MI)    102
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     3  0  
+00003-00003     0  1  
+00004-00020    29  0  
+00021-007FF   549  1466  
+00800-00FFF     0  2048  
+
+
+

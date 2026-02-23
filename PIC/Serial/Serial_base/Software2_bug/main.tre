@@ -1,0 +1,16 @@
+ÀÄmain
+   ÀÄMAIN  0/22  Ram=0
+      ÃÄ@cinit1  (Inline)  Ram=0
+      ÀÄlcd_init  0/112  Ram=2
+         ÃÄ@delay_ms1  0/22  Ram=1
+         ÃÄlcd_send_nibble  0/12  Ram=1
+         ÃÄ@delay_ms1  0/22  Ram=1
+         ÃÄlcd_send_nibble  0/12  Ram=1
+         ÃÄ@delay_ms1  0/22  Ram=1
+         ÃÄ@const654  0/5  Ram=0
+         ÀÄlcd_send_byte  (Inline)  Ram=3
+            ÃÄlcd_read_byte  (Inline)  Ram=3
+            ³  ÃÄlcd_read_nibble  0/6  Ram=0
+            ³  ÀÄlcd_read_nibble  0/6  Ram=0
+            ÃÄlcd_send_nibble  0/12  Ram=1
+            ÀÄlcd_send_nibble  0/12  Ram=1

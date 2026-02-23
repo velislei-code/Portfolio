@@ -1,0 +1,18 @@
+#include <main.h>
+
+#include <lcd.c>
+
+char error, byte_read;
+
+void main()
+{
+   error = soft_uart_ini(&portc, 7, 6, 9600, 0);
+   
+   lcd_init();
+
+   while(TRUE)
+   {
+      //TODO: User Code
+   }
+
+}

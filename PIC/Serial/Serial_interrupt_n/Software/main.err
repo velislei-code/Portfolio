@@ -1,0 +1,7 @@
+>>> Warning 229 "main.c" Line 79(1,1): Subscript out of range
+>>> Warning 201 "main.c" Line 182(1,1): Assignment inside relational expression
+>>> Warning 216 "main.c" Line 413(1,2): Interrupts disabled during call to prevent re-entrancy:  (@PSTRINGR_2400_106_105)
+>>> Warning 216 "main.c" Line 413(1,2): Interrupts disabled during call to prevent re-entrancy:  (@delay_ms1)
+      Memory usage:   ROM=52%      RAM=8% - 49%
+      0 Errors,  4 Warnings.
+Build Successful.

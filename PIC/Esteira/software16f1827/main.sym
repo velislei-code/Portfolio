@@ -1,0 +1,159 @@
+004-005 @WRITE_PROGRAM_MEMORY8.P1
+004-005 @READ_PACKED_MEMORY.P2
+004-005 @READ_PROGRAM_MEMORY8.P3
+004-005 @WRITE_PACKED_MEMORY.P4
+006-007 @READ_PACKED_MEMORY.P1
+006-007 @WRITE_PACKED_MEMORY.P2
+00D     lcd
+00D     lcdlat
+020-021 analogico
+022-023 memVolt
+024-025 t_Volts
+026-027 memRpm
+028-029 f_Rpm
+02A     bMemPulso
+02B-02C iContaPulso
+02D-02E iContaCiclo
+02F-032 iFrequencia
+033-034 iSeg
+035-036 iMin
+037-038 duty1
+039-03A MAIN.iMiliSeg
+03B-03C MAIN.tensao
+03D-040 MAIN.fContaRpm
+041-042 @PRINTF_LU_669.P1
+041     @delay_ms2.P2
+041-042 Volts.t_Volts
+041     lcd_init.i
+041     @PSTRINGCN7_669.P1
+041     MAIN.@SCRATCH1
+041     @PSTRINGC7_669.@SCRATCH1
+042     ContaRpm.bPulso
+042     lcd_init.@SCRATCH1
+042     @PSTRINGC7_669.@SCRATCH2
+042     @PSTRINGCN7_669.@SCRATCH1
+043     medias_volt.i
+043     PulsoDetecte.bPulso
+043-044 @MUL1616.P1
+043-044 @ITOF.P2
+043     @PSTRINGC7_669.@SCRATCH3
+043     @PRINTF_LU_669.@SCRATCH1
+043     @PSTRINGCN7_669.@SCRATCH2
+043     ContaRpm.@SCRATCH1
+043     Volts.@SCRATCH1
+044-045 medias_volt.volt_armazena
+044     @PSTRINGC7_669.@SCRATCH4
+044     @PRINTF_LU_669.@SCRATCH2
+044     @PSTRINGCN7_669.@SCRATCH3
+044     Volts.@SCRATCH2
+045-046 @MUL1616.P1
+045     @PRINTF_LU_669.@SCRATCH3
+045     @PSTRINGCN7_669.@SCRATCH4
+046-047 @DIV1616.P1
+046     lerPortaAdc.canal
+046     @PRINTF_LU_669.@SCRATCH4
+047     @PRINTF_LU_669.@SCRATCH5
+047     @MUL1616.@SCRATCH1
+048-049 @DIV1616.P1
+048     @PRINTF_LU_669.@SCRATCH6
+049     @PRINTF_LU_669.@SCRATCH7
+04A     lcd_putc.c
+04A     @DIV1616.@SCRATCH1
+04B     lcd_gotoxy.x
+04B     @delay_ms1.P1
+04C     lcd_gotoxy.y
+04D     lcd_gotoxy.address
+04E     lcd_gotoxy.@SCRATCH1
+04F     lcd_send_byte.address
+050     lcd_send_byte.n
+051     lcd_read_byte.low
+051     lcd_send_byte.@SCRATCH1
+052     lcd_read_byte.high
+052     lcd_send_nibble.n
+053     lcd_read_byte.@SCRATCH1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+08D     lcdtris
+111.6   C1OUT
+113.6   C2OUT
+191-192 @READ_PROGRAM_MEMORY8.P1
+191-192 @WRITE_PROGRAM_MEMORY8.P2
+291     CCP_1
+291     CCP_1_LOW
+292     CCP_1_HIGH
+298     CCP_2_LOW
+298     CCP_2
+299     CCP_2_HIGH
+311     CCP_3_LOW
+311     CCP_3
+312     CCP_3_HIGH
+318     CCP_4
+318     CCP_4_LOW
+319     CCP_4_HIGH
+
+ROM Allocation:
+000003  LCD_INIT_STRING.call
+000004  LCD_INIT_STRING.data
+000008  @const711.call
+000011  @const715.call
+000024  @delay_ms2
+000039  @delay_ms1
+00004F  lcd_send_nibble
+00005B  lcd_read_nibble
+000061  lcd_send_byte
+000067  lcd_read_byte
+0000A1  lcd_init
+0000D3  lcd_gotoxy
+0000E5  lcd_putc
+000111  @PSTRINGC7_669
+000157  lerPortaAdc
+000176  @DIV1616
+00019B  medias_volt
+00019B  Volts
+0001C2  @MUL1616
+0001ED  ContaRpm
+0001EF  PulsoDetecte
+000222  @ITOF
+000254  @PRINTF_LU_669
+0002B2  @PSTRINGCN7_669
+0002FF  MAIN
+0002FF  @cinit1
+00031B  @cinit2
+
+Project Directory:
+    C:\Users\oi298979\Documents\Proteus\Esteira\software\
+
+Project Files:
+    main.c                                                  [25-set-21 10:17  CRC=D15AD0DA]
+    ..\..\Le_An0_lcd\software\main.h                        [05-set-21 18:01  CRC=B723CC71]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F1827.h [03-jul-13 14:28  CRC=CC443070]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Drivers\lcd.c [23-ago-12 09:01  CRC=D28E8746]
+
+Source signature=F9DFDC47
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC16F1827
+    Pointer Size:   16
+    ADC Range:      0-1023
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Enhanced 16:    Yes
+
+Output Files:
+    XREF file:   main.xsym
+    Errors:      main.err
+    Ext Symbols: main.esym
+    INHX8:       main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA

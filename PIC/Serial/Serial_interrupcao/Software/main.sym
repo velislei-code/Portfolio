@@ -1,0 +1,105 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+004-005 @READ_PACKED_MEMORY.P2
+004-005 @WRITE_PROGRAM_MEMORY8.P3
+004-005 @WRITE_PACKED_MEMORY.P4
+006-007 @READ_PACKED_MEMORY.P1
+006-007 @WRITE_PACKED_MEMORY.P2
+020     @INTERRUPT_AREA
+021     @INTERRUPT_AREA
+022     @INTERRUPT_AREA
+023     @INTERRUPT_AREA
+024     iDigNum
+025-02E cLinComRX
+02F.0   bResponder
+02F.1   bBusLocalAtivo
+030-034 cMyID
+035     cRX
+036     MAIN.@SCRATCH1
+037     @delay_ms1.P1
+038     lerPortaCom.iPorta
+039-042 lerPortaCom.cRetorna
+043     lerPortaCom.cRX
+044     lerPortaCom.cRxCmd
+045     lerPortaCom.@SCRATCH1
+045     @PSTRINGC7_2400_106_105.@SCRATCH1
+046     lerPortaCom.@SCRATCH2
+046     @PSTRINGC7_2400_106_105.@SCRATCH2
+047     lerPortaCom.@SCRATCH3
+047     @PSTRINGC7_2400_106_105.@SCRATCH3
+047     @PSTRINGR_2400_106_105.@SCRATCH1
+048     lerPortaCom.@SCRATCH4
+048     @PSTRINGC7_2400_106_105.@SCRATCH4
+048     @PSTRINGR_2400_106_105.@SCRATCH2
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+111.6   C1OUT
+113.6   C2OUT
+191-192 @WRITE_PROGRAM_MEMORY8.P1
+191-192 @READ_PROGRAM_MEMORY8.P2
+291     CCP_1
+291     CCP_1_LOW
+292     CCP_1_HIGH
+298     CCP_2
+298     CCP_2_LOW
+299     CCP_2_HIGH
+311     CCP_3_LOW
+311     CCP_3
+312     CCP_3_HIGH
+318     CCP_4
+318     CCP_4_LOW
+319     CCP_4_HIGH
+
+ROM Allocation:
+000021  @PSTRINGC7_2400_106_105
+00006C  RDA_isr
+00006D  lerPortaCom
+0000C9  @PSTRINGR_2400_106_105
+0000FD  @const657.call
+000100  @const660.call
+000103  @const661.call
+000106  @const662.call
+000109  @const665.call
+00010E  @const666.call
+000111  @const668.call
+00011A  @const669.call
+000123  @delay_ms1
+00013A  @cinit1
+00013A  MAIN
+00014B  @cinit2
+
+Project Directory:
+    C:\Users\oi298979\Documents\Proteus\PIC\Serial_interrupcao\Software\
+
+Project Files:
+    main.c                                                  [20-fev-22 20:48  CRC=24FBDFEB]
+    main.h                                                  [20-fev-22 15:28  CRC=23244F5F]
+    ..\..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F1827.h [03-jul-13 14:28  CRC=CC443070]
+
+Source signature=E0A8902A
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC16F1827
+    Pointer Size:   16
+    ADC Range:      0-65535
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Enhanced 16:    Yes
+
+Output Files:
+    XREF file:   main.xsym
+    Errors:      main.err
+    Ext Symbols: main.esym
+    INHX8:       main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA

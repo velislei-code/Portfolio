@@ -1,0 +1,121 @@
+
+ROM used:   2125/4096 (52%)
+            2137/4096 (52%) including unused fragments
+
+            1.6 Average locations per line
+            7.4 Average locations per statement
+
+RAM used:   30/383 (8%) at main() level
+            187/383 (49%) worst case
+
+Stack used: 4 worst case (2 in main + 2 for interrupts)
+Stack size: 16
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  416   286 100  main.c
+   14     0   0  ..\..\Serial_interrupcao\Software\main.h
+  881     0   0  ..\..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F1827.h
+----- -----
+ 1311   286 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     22   1    1             @delay_ms1
+0      4   0    0             @const644
+0      9   0    0    21  0.9  @const647
+0     14   1    0     7  0.3  @const650
+0   1506  71    0    21  0.9  RDA_isr
+0     40   2    1    80  1.6  MAIN
+1     90   4    0   228  2.6  _init
+0     23   1    2             @PSTRINGR_2400_106_105
+ Inline         6   951  7.3  lerPortaCom
+0      8   0    0  1078  8.3  @MEMSET
+0     11   1    0  7703  8.0  @const684
+0     87   4    5             @PSTRINGCN7_2400_106_105
+ Inline        19  6325  8.0  Comando
+0     11   1    0             @const694
+0      2   0    0             @const695
+0     11   1    0             @const698
+0      9   0    0             @const700
+0      4   0    0             @const701
+0      7   0    0             @const703
+0     11   1    0  1924  3.9  @const706
+0     11   1    0             @const707
+0      4   0    0  1924  3.9  @const709
+0      4   0    0  1924  3.9  @const710
+0      4   0    0  1924  3.9  @const711
+0      4   0    0             @const712
+0      4   0    0             @const713
+0      4   0    0             @const714
+0      4   0    0             @const715
+0      4   0    0             @const716
+0      4   0    0             @const717
+0      4   0    0             @const718
+0      4   0    0             @const719
+0      4   0    0             @const720
+0      4   0    0             @const721
+0      4   0    0             @const722
+0      4   0    0             @const723
+0      4   0    0             @const724
+0      4   0    0             @const725
+0      4   0    0             @const726
+0      4   0    0             @const727
+0      4   0    0             @const728
+0      4   0    0             @const729
+0      4   0    0             @const730
+0      4   0    0             @const731
+0      4   0    0  1916  4.0  @const732
+0      4   0    0  1916  4.0  @const735
+0      4   0    0  1916  4.0  @const737
+0      4   0    0             @const739
+0      4   0    0             @const741
+0      4   0    0             @const743
+0      4   0    0             @const745
+0      4   0    0             @const747
+0      4   0    0             @const749
+0      4   0    0             @const751
+0      4   0    0             @const753
+0      4   0    0             @const755
+0      4   0    0             @const757
+0      4   0    0             @const759
+0      4   0    0             @const761
+0      4   0    0             @const763
+0      4   0    0             @const765
+0      4   0    0             @const767
+0      4   0    0             @const769
+0      4   0    0             @const771
+0      4   0    0             @const773
+0      4   0    0             @const775
+0      4   0    0             @const777
+0      4   0    0             @const779
+0      4   0    0             @const781
+0      6   0    0    17  0.8  reset
+ Inline         1   277  3.2  fixarBUS
+ Inline       120   221  2.9  help
+0      7   0    0   221  2.9  @const788
+0      8   0    0   221  2.9  @const789
+ Inline         0             @cinit1
+
+Program metrics:
+    Functions               21
+    Statements              286
+    Comments                318
+    Volume (V)              45976
+    Difficulty (D)          78.8
+    Effort to implement (E) 3621228
+    Time to implement (T)   55 hours, 53 minutes
+    Est Delivered Bugs (B)  8
+    Cyclomatic Complexity   206
+    Maintainability (MI)    74
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     3  0  
+00003-00003     0  1  
+00004-00020    29  0  
+00021-007FF  2003  12  
+00800-00FFF    90  1958  
+
+
+

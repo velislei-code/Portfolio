@@ -1,0 +1,19 @@
+[PROJECT]
+Target=prjGarrafaH2.hex
+Processor_Text=PIC16F1827
+CCSVersion=5.008
+Compiler=PCM
+[Target Data]
+FileList=prjGarrafaH2.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[prjGarrafaH2.c]
+Type=4
+[mru-list]
+1=prjGarrafaH2.c
+[Opened Files]
+1=prjGarrafaH2.c
+2=
+[Units]
+Count=1
+1=prjGarrafaH2 (main)

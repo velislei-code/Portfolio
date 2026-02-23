@@ -1,0 +1,841 @@
+CCS PCM C Compiler, Version 5.008, 5967               21-set-22 12:27
+
+               Filename:   D:\Projetos\PIC\GarrafaH2\software\prjGarrafaH2.lst
+
+               ROM used:   485 words (12%)
+                           Largest free fragment is 2048
+               RAM used:   19 (5%) at main() level
+                           39 (10%) worst case
+               Stack used: 7 locations (3 in main + 4 for interrupts)
+               Stack size: 16
+
+*
+0000:  MOVLP  00
+0001:  GOTO   198
+0002:  NOP
+*
+0004:  CLRF   03
+0005:  MOVLP  00
+0006:  MOVLB  00
+0007:  MOVF   77,W
+0008:  MOVWF  20
+0009:  MOVF   78,W
+000A:  MOVWF  21
+000B:  MOVF   79,W
+000C:  MOVWF  22
+000D:  MOVF   7A,W
+000E:  MOVWF  23
+000F:  CLRF   05
+0010:  MOVLW  91
+0011:  MOVWF  04
+0012:  BTFSS  00.0
+0013:  GOTO   016
+0014:  BTFSC  11.0
+0015:  GOTO   01F
+0016:  MOVF   20,W
+0017:  MOVWF  77
+0018:  MOVF   21,W
+0019:  MOVWF  78
+001A:  MOVF   22,W
+001B:  MOVWF  79
+001C:  MOVF   23,W
+001D:  MOVWF  7A
+001E:  RETFIE
+001F:  MOVLP  00
+0020:  GOTO   0A9
+.................... #include <16F1827.h> 
+.................... //////// Standard Header file for the PIC16F1827 device //////////////// 
+.................... #device PIC16F1827 
+*
+004B:  CLRF   77
+004C:  CLRF   78
+004D:  MOVF   34,W
+004E:  BCF    03.0
+004F:  BTFSC  35.0
+0050:  ADDWF  77,F
+0051:  RRF    77,F
+0052:  RRF    78,F
+0053:  BTFSC  35.1
+0054:  ADDWF  77,F
+0055:  RRF    77,F
+0056:  RRF    78,F
+0057:  BTFSC  35.2
+0058:  ADDWF  77,F
+0059:  RRF    77,F
+005A:  RRF    78,F
+005B:  BTFSC  35.3
+005C:  ADDWF  77,F
+005D:  RRF    77,F
+005E:  RRF    78,F
+005F:  BTFSC  35.4
+0060:  ADDWF  77,F
+0061:  RRF    77,F
+0062:  RRF    78,F
+0063:  BTFSC  35.5
+0064:  ADDWF  77,F
+0065:  RRF    77,F
+0066:  RRF    78,F
+0067:  BTFSC  35.6
+0068:  ADDWF  77,F
+0069:  RRF    77,F
+006A:  RRF    78,F
+006B:  BTFSC  35.7
+006C:  ADDWF  77,F
+006D:  RRF    77,F
+006E:  RRF    78,F
+006F:  RETURN
+....................  
+.................... #list 
+....................  
+.................... //#use delay(clock=4M)     // iAjuste em 15 
+.................... #USE DELAY (INTERNAL=4M)   // iAjuste em 3 
+*
+0021:  MOVLW  20
+0022:  MOVWF  05
+0023:  MOVLW  17
+0024:  MOVWF  04
+0025:  MOVF   00,W
+0026:  BTFSC  03.2
+0027:  GOTO   036
+0028:  MOVLW  01
+0029:  MOVWF  78
+002A:  CLRF   77
+002B:  DECFSZ 77,F
+002C:  GOTO   02B
+002D:  DECFSZ 78,F
+002E:  GOTO   02A
+002F:  MOVLW  4A
+0030:  MOVWF  77
+0031:  DECFSZ 77,F
+0032:  GOTO   031
+0033:  GOTO   034
+0034:  DECFSZ 00,F
+0035:  GOTO   028
+0036:  RETURN
+.................... #fuses HS, NOWDT, NOLVP 
+.................... //#use standard_io(A)        // Ele "cuida" da direção dos pinos- ai a Dir fica defeinida por input ou output 
+....................                            // A0 a A5 podem ser usadas como In ou Out,  
+.................... //#use standard_io(B)        // B0 a B7 podem ser usadas como In ou Out                            
+....................                             
+.................... /* 
+.................... #define LCD_ENABLE_PIN PIN_B0 
+.................... #define LCD_RS_PIN PIN_B1 
+.................... #define LCD_RW_PIN PIN_B2 
+.................... #define LCD_DATA4 PIN_B4 
+.................... #define LCD_DATA5 PIN_B5 
+.................... #define LCD_DATA6 PIN_B6 
+.................... #define LCD_DATA7 PIN_B7 
+.................... */ 
+....................  
+.................... // #include <lcd.c> 
+....................  
+.................... #define Minuto 0 
+.................... #define Hora 1 
+.................... #define Down 0 
+.................... #define Up 1 
+.................... #define Nula 2 
+.................... #define Nao 0 
+.................... #define Sim 1 
+.................... #define Off 0 
+.................... #define On 1 
+....................  
+....................  
+.................... void Clock_PIC(); 
+.................... void zerarClock(); 
+.................... void check_PressBtn(); 
+.................... void buzzer(int iN, int iT);                // Aciona Buzzer(n.Beeps, Tempo em ms) 
+....................  
+....................  
+.................... void inicializar();        // Inicia variaveis 
+.................... void Start();              // Inicia Ciclo 
+.................... void Stop();               // Para Ciclo 
+....................  
+.................... void PoloPN();            // Eletrodos +/- 
+.................... void PoloNP();            // Eletrodos -/+ 
+.................... void Aterrar();           // Eletrodos -/- 
+....................  
+.................... int iDecSeg = 0; 
+.................... int iSeg = 0; 
+.................... int iMin = 0; 
+....................  
+.................... int iCircuito = Off;       // Ctrl estado atual do circuito: On(1)/Off(0) 
+.................... int iBtnPress = 0;         // Ctrl o pressionamento do Btn On/Off 
+.................... int iStartCiclo = Nao;     // Ctrl/limita somente 1 start em ciclo p/ evitar descontrole 
+.................... int iTempo = 6; 
+.................... int iHabExecPoloNP = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas 
+.................... int iHabExecPoloPN = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas 
+.................... //char cMsg = '!'; 
+.................... int iModoEspera = Nao;    // Ctrl aviso discreto de p/ evitar esquecer - após H2 finalizado 
+....................  
+....................  
+.................... #INT_TIMER1 
+.................... void interrupt() 
+.................... {    
+....................   // output_toggle(PIN_A0);      
+....................    set_timer1(0x9e58);    
+*
+00A9:  CLRF   16
+00AA:  MOVLW  9E
+00AB:  MOVWF  17
+00AC:  MOVLW  58
+00AD:  MOVWF  16
+....................    Clock_PIC();   // Faz contagem dos tempos hh:mm:ss 
+....................  
+*
+0124:  BCF    11.0
+0125:  MOVLP  00
+0126:  GOTO   016
+.................... } 
+....................  
+.................... void main() 
+*
+0198:  MOVLW  6A
+0199:  MOVLB  01
+019A:  MOVWF  19
+019B:  MOVLB  00
+019C:  CLRF   25
+019D:  CLRF   26
+019E:  CLRF   27
+019F:  CLRF   28
+01A0:  CLRF   29
+01A1:  CLRF   2A
+01A2:  MOVLW  06
+01A3:  MOVWF  2B
+01A4:  MOVLW  01
+01A5:  MOVWF  2C
+01A6:  MOVWF  2D
+01A7:  CLRF   2E
+01A8:  MOVLB  03
+01A9:  CLRF   0C
+01AA:  CLRF   0D
+01AB:  MOVLB  02
+01AC:  CLRF   12
+01AD:  CLRF   11
+01AE:  CLRF   14
+01AF:  CLRF   13
+.................... { 
+....................    setup_timer_1 (T1_INTERNAL | T1_DIV_BY_4);            // p/ Clock de 4Mhz 
+01B0:  MOVLW  25
+01B1:  MOVLB  00
+01B2:  MOVWF  18
+01B3:  CLRF   19
+....................    set_timer1(0x9e58);                                   // 100ms 
+01B4:  CLRF   16
+01B5:  MOVLW  9E
+01B6:  MOVWF  17
+01B7:  MOVLW  58
+01B8:  MOVWF  16
+....................    enable_interrupts(INT_TIMER1); 
+01B9:  MOVLB  01
+01BA:  BSF    11.0
+....................    enable_interrupts(GLOBAL); 
+01BB:  MOVLW  C0
+01BC:  IORWF  0B,F
+01BD:  MOVLB  00
+01BE:  CLRF   24
+01BF:  BTFSC  0B.7
+01C0:  BSF    24.7
+01C1:  BCF    0B.7
+....................  
+....................     
+....................  //  lcd_init(); 
+....................   // printf(lcd_putc,"\f Circuito H2");       // imprimir no lcd (\f limpa o lcd) 
+....................    delay_ms(50);     // atualiza??o de tela a cada X ms 
+01C2:  MOVLW  32
+01C3:  MOVWF  37
+01C4:  CALL   021
+01C5:  BTFSC  24.7
+01C6:  BSF    0B.7
+....................     
+....................   
+....................    inicializar(); 
+01C7:  GOTO   127
+01C8:  CLRF   24
+01C9:  BTFSC  0B.7
+01CA:  BSF    24.7
+01CB:  BCF    0B.7
+....................    Aterrar(); 
+01CC:  CALL   088
+01CD:  BTFSC  24.7
+01CE:  BSF    0B.7
+....................     
+....................    while(TRUE) 
+....................    { 
+....................          // Faz leitura das config das Dips   
+....................          /* 
+....................          if((input(pin_B5) == 0)&&(input(pin_B6) == 0)&&(input(pin_B7) == 0)){ iTempo = 1;   } 
+....................          if((input(pin_B5) == 0)&&(input(pin_B6) == 0)&&(input(pin_B7) == 1)){ iTempo = 3;   } 
+....................          if((input(pin_B5) == 0)&&(input(pin_B6) == 1)&&(input(pin_B7) == 0)){ iTempo = 6;   } 
+....................          if((input(pin_B5) == 0)&&(input(pin_B6) == 1)&&(input(pin_B7) == 1)){ iTempo = 12;  } 
+....................          if((input(pin_B5) == 1)&&(input(pin_B6) == 0)&&(input(pin_B7) == 0)){ iTempo = 24;  } 
+....................          if((input(pin_B5) == 1)&&(input(pin_B6) == 0)&&(input(pin_B7) == 1)){ iTempo = 48;  } 
+....................          if((input(pin_B5) == 1)&&(input(pin_B6) == 1)&&(input(pin_B7) == 0)){ iTempo = 72;  } 
+....................          if((input(pin_B5) == 1)&&(input(pin_B6) == 1)&&(input(pin_B7) == 1)){ iTempo = 120;  } 
+....................          */ 
+....................          // printf(lcd_putc,"\f Clock_PIC");       // imprimir no lcd (\f limpa o lcd)   
+....................          
+....................    //     printf(lcd_putc,"\f %d:%d:%d - %c \n\r  On: %d", iMin, iSeg, iDecSeg, cMsg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd) 
+....................           
+....................           
+....................        
+....................       check_PressBtn(); 
+01CF:  GOTO   135
+....................       
+....................       if(iCircuito == On){    
+01D0:  DECFSZ 28,W
+01D1:  GOTO   1D4
+....................             Start();          
+01D2:  GOTO   184
+....................        }else{ 
+01D3:  GOTO   1DB
+01D4:  CLRF   24
+01D5:  BTFSC  0B.7
+01D6:  BSF    24.7
+01D7:  BCF    0B.7
+....................             Stop();             
+01D8:  CALL   098
+01D9:  BTFSC  24.7
+01DA:  BSF    0B.7
+01DB:  CLRF   24
+01DC:  BTFSC  0B.7
+01DD:  BSF    24.7
+01DE:  BCF    0B.7
+....................        } 
+....................         
+....................         
+....................        delay_ms(100); 
+01DF:  MOVLW  64
+01E0:  MOVWF  37
+01E1:  CALL   021
+01E2:  BTFSC  24.7
+01E3:  BSF    0B.7
+01E4:  GOTO   1CF
+....................         
+....................    }  // While 
+....................  
+.................... } 
+....................  
+01E5:  SLEEP
+.................... void inicializar(){ 
+....................  
+....................       iDecSeg = 0; 
+*
+0127:  CLRF   25
+....................       iSeg = 0; 
+0128:  CLRF   26
+....................       iMin = 0; 
+0129:  CLRF   27
+....................        
+....................       iCircuito = Off;       // Ctrl estado atual do circuito: On(1)/Off(0) 
+012A:  CLRF   28
+....................       iBtnPress = Nao;         // Ctrl o pressionamento do Btn On/Off 
+012B:  CLRF   29
+....................       iStartCiclo = Nao;     // Ctrl/limita somente 1 start em ciclo p/ evitar descontrole 
+012C:  CLRF   2A
+....................       iTempo = 6; 
+012D:  MOVLW  06
+012E:  MOVWF  2B
+....................       iHabExecPoloNP = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas 
+012F:  MOVLW  01
+0130:  MOVWF  2C
+....................       iHabExecPoloPN = Sim;   // Ctrl exec.da funcao somente 1 vez p/ ciclo, p/ evitar inversoes continuas 
+0131:  MOVWF  2D
+....................      // cMsg = '!'; 
+....................       iModoEspera = Nao;    // Ctrl aviso discreto de p/ evitar esquecer - após H2 finalizado 
+0132:  CLRF   2E
+0133:  MOVLP  00
+0134:  GOTO   1C8 (RETURN)
+....................       
+.................... } 
+....................  
+.................... void Clock_PIC(){ 
+.................... // Faz ctrl de seg, min, hr 
+....................         
+....................       if(iDecSeg > 9){ 
+*
+00AE:  MOVF   25,W
+00AF:  SUBLW  09
+00B0:  BTFSC  03.0
+00B1:  GOTO   0B4
+....................          iDecSeg = 0; 
+00B2:  CLRF   25
+....................          iSeg++; 
+00B3:  INCF   26,F
+....................       } 
+....................        
+....................       if(iSeg > 59){ 
+00B4:  MOVF   26,W
+00B5:  SUBLW  3B
+00B6:  BTFSC  03.0
+00B7:  GOTO   0BB
+....................          iDecSeg = 0; 
+00B8:  CLRF   25
+....................          iSeg = 0; 
+00B9:  CLRF   26
+....................          iMin++; 
+00BA:  INCF   27,F
+....................       } 
+....................        
+....................       if(iMin > 59){ 
+00BB:  MOVF   27,W
+00BC:  SUBLW  3B
+00BD:  BTFSC  03.0
+00BE:  GOTO   0C2
+....................          iDecSeg = 0; 
+00BF:  CLRF   25
+....................          iSeg = 0; 
+00C0:  CLRF   26
+....................          iMin = 0;         
+00C1:  CLRF   27
+....................           
+....................       } 
+....................        
+....................       // INicio de tratamento de processos 
+....................       if(iCircuito == On){ 
+00C2:  DECFSZ 28,W
+00C3:  GOTO   113
+....................           
+....................          if(iSeg < iTempo){ 
+00C4:  MOVF   2B,W
+00C5:  SUBWF  26,W
+00C6:  BTFSC  03.0
+00C7:  GOTO   0CD
+....................              PoloPN();    
+00C8:  CALL   037
+....................              delay_ms(10); 
+00C9:  MOVLW  0A
+00CA:  MOVWF  37
+00CB:  CALL   021
+....................              break;   
+....................                 
+....................          } 
+00CC:  GOTO   112
+....................          else if( (iSeg > iTempo)&&(iSeg < iTempo*2) ){  
+00CD:  MOVF   26,W
+00CE:  SUBWF  2B,W
+00CF:  BTFSC  03.0
+00D0:  GOTO   0ED
+00D1:  BCF    03.0
+00D2:  RLF    2B,W
+00D3:  SUBWF  26,W
+00D4:  BTFSC  03.0
+00D5:  GOTO   0ED
+....................           
+....................              PoloNP();   
+....................              delay_ms(10); 
+*
+00E9:  MOVLW  0A
+00EA:  MOVWF  37
+00EB:  CALL   021
+....................              break;     
+....................          } 
+00EC:  GOTO   112
+....................          else if( (iSeg > iTempo*2)&&(iSeg < iTempo*3) ){  
+00ED:  BCF    03.0
+00EE:  RLF    2B,W
+00EF:  SUBWF  26,W
+00F0:  BTFSC  03.2
+00F1:  GOTO   107
+00F2:  BTFSS  03.0
+00F3:  GOTO   107
+00F4:  MOVF   2B,W
+00F5:  MOVWF  34
+00F6:  MOVLW  03
+00F7:  MOVWF  35
+00F8:  CALL   04B
+00F9:  MOVF   78,W
+00FA:  SUBWF  26,W
+00FB:  BTFSC  03.0
+00FC:  GOTO   107
+....................           
+....................              buzzer(3, 100);            // Aciona Buzzer(3beep de 100ms), aviso de finalizacao 
+00FD:  MOVLW  03
+00FE:  MOVWF  34
+00FF:  MOVLW  64
+0100:  MOVWF  35
+0101:  CALL   070
+....................              Stop(); 
+0102:  CALL   098
+....................              iModoEspera = Sim;         // H2 finalizado, Habilita aviso anti-esquecimento 
+0103:  MOVLW  01
+0104:  MOVWF  2E
+....................              zerarClock(); 
+0105:  CALL   0A5
+....................              break; 
+....................          } 
+0106:  GOTO   112
+....................          else if(iSeg > iTempo*3){  
+0107:  MOVF   2B,W
+0108:  MOVWF  34
+0109:  MOVLW  03
+010A:  MOVWF  35
+010B:  CALL   04B
+010C:  MOVF   78,W
+010D:  SUBWF  26,W
+010E:  BTFSC  03.2
+010F:  GOTO   112
+0110:  BTFSC  03.0
+....................           
+....................             Stop(); 
+0111:  CALL   098
+....................              break;    
+....................         } 
+....................           
+....................       }else{ 
+0112:  GOTO   114
+....................           Stop(); 
+0113:  CALL   098
+....................           break;       
+....................       } 
+....................        
+....................       // Caso H2 tenha finalizado...aciona aviso de modo espera 
+....................       if( (iModoEspera == Sim)&&(iCircuito == Off)){ 
+0114:  DECFSZ 2E,W
+0115:  GOTO   123
+0116:  MOVF   28,F
+0117:  BTFSS  03.2
+0118:  GOTO   123
+....................          if(iSeg > iTempo){     
+0119:  MOVF   26,W
+011A:  SUBWF  2B,W
+011B:  BTFSC  03.0
+011C:  GOTO   123
+....................             buzzer(1, 50);       // aciona buzzer (1beep de 50ms) 
+011D:  MOVLW  01
+011E:  MOVWF  34
+011F:  MOVLW  32
+0120:  MOVWF  35
+0121:  CALL   070
+....................             zerarClock(); 
+0122:  CALL   0A5
+....................          } 
+....................       } 
+....................        
+....................    
+....................       iDecSeg++;  // Incrementa DecSegundos 
+0123:  INCF   25,F
+....................        
+.................... } 
+....................  
+.................... void zerarClock(){ 
+....................  
+....................       iDecSeg = 0; 
+*
+00A5:  CLRF   25
+....................       iSeg = 0; 
+00A6:  CLRF   26
+....................       iMin = 0;  
+00A7:  CLRF   27
+00A8:  RETURN
+.................... } 
+....................  
+....................  
+.................... void PoloPN(){ 
+....................  
+....................       if(iHabExecPoloPN == Sim){  // Condicao evita exec.varias vezes no mesmo ciclo, o q estava causanso inversão continua 
+*
+0037:  DECFSZ 2D,W
+0038:  GOTO   04A
+....................        
+....................         output_high(pin_A0);     // Led Azul (H2 acionado)    
+0039:  MOVLB  01
+003A:  BCF    0C.0
+003B:  MOVLB  02
+003C:  BSF    0C.0
+....................         output_low(pin_B0);      // Polos (+/-) 
+003D:  MOVLB  01
+003E:  BCF    0D.0
+003F:  MOVLB  02
+0040:  BCF    0D.0
+....................         output_high(pin_B1);   
+0041:  MOVLB  01
+0042:  BCF    0D.1
+0043:  MOVLB  02
+0044:  BSF    0D.1
+....................         iHabExecPoloPN = Nao;     // Como ja exec.neste ciclo, bloqueia nova exec. 
+0045:  MOVLB  00
+0046:  CLRF   2D
+....................      //   printf(lcd_putc,"\f %d:%d:%d - Pn \n\r On: %d", iMin, iSeg, iDecSeg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd) 
+....................        // cMsg = 'P'; 
+....................         delay_ms(50); 
+0047:  MOVLW  32
+0048:  MOVWF  37
+0049:  CALL   021
+....................       } 
+004A:  RETURN
+.................... } 
+....................  
+.................... void PoloNP(){ 
+....................  
+....................     if(iHabExecPoloNP == Sim){    // Condicao evita exec.varias vezes no mesmo ciclo, o q estava causanso inversão continua 
+*
+00D6:  DECFSZ 2C,W
+00D7:  GOTO   0E9
+....................         output_high(pin_A0);     // Led Azul (H2 acionado)    
+00D8:  MOVLB  01
+00D9:  BCF    0C.0
+00DA:  MOVLB  02
+00DB:  BSF    0C.0
+....................         output_high(pin_B0);     // Polos (-/+) 
+00DC:  MOVLB  01
+00DD:  BCF    0D.0
+00DE:  MOVLB  02
+00DF:  BSF    0D.0
+....................         output_low(pin_B1);   
+00E0:  MOVLB  01
+00E1:  BCF    0D.1
+00E2:  MOVLB  02
+00E3:  BCF    0D.1
+....................         iHabExecPoloNP = Nao;     // Como ja exec.neste ciclo, bloqueia nova exec. 
+00E4:  MOVLB  00
+00E5:  CLRF   2C
+....................      //   printf(lcd_putc,"\f %d:%d:%d - Np \n\r On: %d", iMin, iSeg, iDecSeg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd) 
+....................        // cMsg = 'N'; 
+....................         delay_ms(50); 
+00E6:  MOVLW  32
+00E7:  MOVWF  37
+00E8:  CALL   021
+....................     } 
+.................... } 
+....................  
+.................... void Aterrar(){ 
+....................        
+....................      output_high(pin_B0);     // 2 eletrodos ao Negativo (-/-) 
+*
+0088:  MOVLB  01
+0089:  BCF    0D.0
+008A:  MOVLB  02
+008B:  BSF    0D.0
+....................      output_high(pin_B1);   
+008C:  MOVLB  01
+008D:  BCF    0D.1
+008E:  MOVLB  02
+008F:  BSF    0D.1
+....................      iHabExecPoloNP = Sim;     // Habilita Exec.da funcao 
+0090:  MOVLW  01
+0091:  MOVLB  00
+0092:  MOVWF  2C
+....................      iHabExecPoloPN = Sim; 
+0093:  MOVWF  2D
+....................     // printf(lcd_putc,"\f %d:%d:%d - ATR \n\r On: %d", iMin, iSeg, iDecSeg, iCircuito);        // L? a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd) 
+....................      //cMsg = 'A'; 
+....................      delay_ms(50); 
+0094:  MOVLW  32
+0095:  MOVWF  37
+0096:  CALL   021
+0097:  RETURN
+.................... } 
+....................  
+.................... void Start(){ 
+....................     
+....................      output_high(pin_A0);    // Led Azul (H2 acionado)                        
+*
+0184:  MOVLB  01
+0185:  BCF    0C.0
+0186:  MOVLB  02
+0187:  BSF    0C.0
+0188:  MOVLB  00
+0189:  CLRF   24
+018A:  BTFSC  0B.7
+018B:  BSF    24.7
+018C:  BCF    0B.7
+....................      PoloPN();    
+018D:  CALL   037
+018E:  BTFSC  24.7
+018F:  BSF    0B.7
+....................          
+....................      if(iStartCiclo == Sim){        // Condicao evita que exec.continuamente - assim exec.somente 1x 
+0190:  DECFSZ 2A,W
+0191:  GOTO   196
+....................           
+....................          iStartCiclo = Nao;         // Bloqueia novo start p/ este ciclo 
+0192:  CLRF   2A
+....................          iDecSeg = 0; 
+0193:  CLRF   25
+....................          iSeg = 0; 
+0194:  CLRF   26
+....................          iMin = 0; 
+0195:  CLRF   27
+....................       } 
+0196:  MOVLP  00
+0197:  GOTO   1D3 (RETURN)
+....................       
+.................... } 
+....................  
+.................... void Stop(){ 
+....................  
+....................       output_low(pin_A0);           // Led Azul (H2 desligado)   
+*
+0098:  MOVLB  01
+0099:  BCF    0C.0
+009A:  MOVLB  02
+009B:  BCF    0C.0
+....................       Aterrar(); 
+009C:  MOVLB  00
+009D:  CALL   088
+....................              
+....................       iCircuito = Off; 
+009E:  CLRF   28
+....................        
+....................        if(iStartCiclo == Nao){      // Condicao evita que exec.continuamente - assim exec.somente 1x 
+009F:  MOVF   2A,F
+00A0:  BTFSS  03.2
+00A1:  GOTO   0A4
+....................             iStartCiclo = Sim;         // Libera novo start p/ este ciclo 
+00A2:  MOVLW  01
+00A3:  MOVWF  2A
+....................        } 
+00A4:  RETURN
+....................  
+.................... } 
+....................  
+....................  
+.................... void buzzer(int iN, int iT){ 
+....................  // Ativa Buzzzer - Avisa finalizacao dos ciclos com 3 Bips 
+....................       for(int bz=0; bz<iN; bz++){ 
+*
+0070:  CLRF   36
+0071:  MOVF   34,W
+0072:  SUBWF  36,W
+0073:  BTFSC  03.0
+0074:  GOTO   087
+....................          output_high(pin_A1);    // Led Azul (H2 acionado) 
+0075:  MOVLB  01
+0076:  BCF    0C.1
+0077:  MOVLB  02
+0078:  BSF    0C.1
+....................          delay_ms(iT); 
+0079:  MOVLB  00
+007A:  MOVF   35,W
+007B:  MOVWF  37
+007C:  CALL   021
+....................          output_low(pin_A1);    // Led Azul (H2 acionado) 
+007D:  MOVLB  01
+007E:  BCF    0C.1
+007F:  MOVLB  02
+0080:  BCF    0C.1
+....................          delay_ms(iT); 
+0081:  MOVLB  00
+0082:  MOVF   35,W
+0083:  MOVWF  37
+0084:  CALL   021
+0085:  INCF   36,F
+0086:  GOTO   071
+....................       } 
+0087:  RETURN
+....................  
+.................... } 
+....................  
+.................... void check_PressBtn(){ 
+*
+0135:  MOVLW  02
+0136:  MOVWF  2F
+....................    // Verifica se botao foi solto(presenca de borda de subida) 
+....................     
+....................       int iBorda = Nula; 
+....................     
+....................       if( (iBtnPress == Nao)&&(input(pin_B2) == 0) ){  iBorda = Nula; iBtnPress = 0;} 
+0137:  MOVF   29,F
+0138:  BTFSS  03.2
+0139:  GOTO   143
+013A:  MOVLB  01
+013B:  BSF    0D.2
+013C:  MOVLB  00
+013D:  BTFSC  0D.2
+013E:  GOTO   143
+013F:  MOVLW  02
+0140:  MOVWF  2F
+0141:  CLRF   29
+0142:  GOTO   168
+....................       else if( (iBtnPress == Nao)&&(input(pin_B2) == 1) ){ iBorda = Down; iBtnPress = 1; } 
+0143:  MOVF   29,F
+0144:  BTFSS  03.2
+0145:  GOTO   14F
+0146:  MOVLB  01
+0147:  BSF    0D.2
+0148:  MOVLB  00
+0149:  BTFSS  0D.2
+014A:  GOTO   14F
+014B:  CLRF   2F
+014C:  MOVLW  01
+014D:  MOVWF  29
+014E:  GOTO   168
+....................       else if( (iBtnPress == Sim)&&(input(pin_B2) == 0) ){ iBorda = Up; iBtnPress = 0; }          // Detectado Borda de subida aqui 
+014F:  DECFSZ 29,W
+0150:  GOTO   15A
+0151:  MOVLB  01
+0152:  BSF    0D.2
+0153:  MOVLB  00
+0154:  BTFSC  0D.2
+0155:  GOTO   15A
+0156:  MOVLW  01
+0157:  MOVWF  2F
+0158:  CLRF   29
+0159:  GOTO   168
+....................       else if( (iBtnPress == Sim)&&(input(pin_B2) == 1) ){ iBorda = Down;  iBtnPress = 1;} 
+015A:  DECFSZ 29,W
+015B:  GOTO   165
+015C:  MOVLB  01
+015D:  BSF    0D.2
+015E:  MOVLB  00
+015F:  BTFSS  0D.2
+0160:  GOTO   165
+0161:  CLRF   2F
+0162:  MOVLW  01
+0163:  MOVWF  29
+0164:  GOTO   168
+....................       else{ iBorda = Nula; iBtnPress = 0; } 
+0165:  MOVLW  02
+0166:  MOVWF  2F
+0167:  CLRF   29
+....................        
+....................        
+....................       if( iBorda == Up ){    
+0168:  DECFSZ 2F,W
+0169:  GOTO   182
+....................        
+....................             // caso Circuito esteja em modo espera(H2 pronto), o pressionar do botão somente tira de modo espera, 1 segundo pressionar vai ligar o circuito 
+....................            if(iModoEspera == Sim){   
+016A:  DECFSZ 2E,W
+016B:  GOTO   179
+....................                   iModoEspera = Nao;      // Tira de modo espera 
+016C:  CLRF   2E
+016D:  CLRF   24
+016E:  BTFSC  0B.7
+016F:  BSF    24.7
+0170:  BCF    0B.7
+....................                   buzzer(2, 50);          // Avisa que recebeu cmd 
+0171:  MOVLW  02
+0172:  MOVWF  34
+0173:  MOVLW  32
+0174:  MOVWF  35
+0175:  CALL   070
+0176:  BTFSC  24.7
+0177:  BSF    0B.7
+....................            }else{ 
+0178:  GOTO   182
+....................                if(iCircuito == On){ iCircuito = Off; } 
+0179:  DECFSZ 28,W
+017A:  GOTO   17D
+017B:  CLRF   28
+017C:  GOTO   182
+....................                else if(iCircuito == Off){ iCircuito = On; } 
+017D:  MOVF   28,F
+017E:  BTFSS  03.2
+017F:  GOTO   182
+0180:  MOVLW  01
+0181:  MOVWF  28
+....................            } 
+....................       } 
+0182:  MOVLP  00
+0183:  GOTO   1D0 (RETURN)
+....................         
+....................       
+.................... } 
+....................  
+....................  
+....................  
+
+Configuration Fuses:
+   Word  1: 3FC2   HS NOWDT PUT MCLR NOPROTECT NOCPD BROWNOUT NOCLKOUT IESO FCMEN
+   Word  2: 1EFF   NOWRT PLL_SW STVREN BORV19 NODEBUG NOLVP

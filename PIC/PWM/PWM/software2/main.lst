@@ -1,0 +1,188 @@
+CCS PCH C Compiler, Version 5.008, 5967               22-jan-22 14:12
+
+               Filename:   C:\Users\oi298979\Documents\Proteus\PWM\PWM\software2\main.lst
+
+               ROM used:   280 bytes (1%)
+                           Largest free fragment is 32488
+               RAM used:   8 (0%) at main() level
+                           9 (0%) worst case
+               Stack used: 1 locations
+               Stack size: 31
+
+*
+0000:  GOTO   002A
+.................... // PIC18F4550 ADC + PWM CCS C code (10-bit PWM resolution) 
+....................   
+.................... #include <18F4550.h> 
+.................... //////// Standard Header file for the PIC18F4550 device //////////////// 
+.................... #device PIC18F4550 
+....................  
+.................... #list 
+....................  
+.................... #device ADC = 10 
+.................... #fuses NOMCLR INTRC_IO 
+.................... #use delay(clock = 8000000) 
+0004:  CLRF   FEA
+0006:  MOVLW  08
+0008:  MOVWF  FE9
+000A:  MOVF   FEF,W
+000C:  BZ    0028
+000E:  MOVLW  02
+0010:  MOVWF  01
+0012:  CLRF   00
+0014:  DECFSZ 00,F
+0016:  BRA    0014
+0018:  DECFSZ 01,F
+001A:  BRA    0012
+001C:  MOVLW  97
+001E:  MOVWF  00
+0020:  DECFSZ 00,F
+0022:  BRA    0020
+0024:  DECFSZ FEF,F
+0026:  BRA    000E
+0028:  RETURN 0
+....................   
+.................... unsigned int16 i, j; 
+.................... void main(){ 
+002A:  CLRF   FF8
+002C:  BCF    FD0.7
+002E:  MOVLW  70
+0030:  MOVWF  FD3
+0032:  MOVF   FD3,W
+0034:  MOVF   FC1,W
+0036:  ANDLW  C0
+0038:  IORLW  0F
+003A:  MOVWF  FC1
+003C:  MOVLW  07
+003E:  MOVWF  FB4
+....................    
+....................   setup_oscillator(OSC_8MHZ);            // Set internal oscillator to 8MHz 
+0040:  MOVLW  70
+0042:  MOVWF  FD3
+0044:  MOVF   FD3,W
+....................   setup_adc(ADC_CLOCK_DIV_8);            // Set ADC conversion time to 8Tosc 
+0046:  MOVF   FC0,W
+0048:  ANDLW  C0
+004A:  IORLW  01
+004C:  MOVWF  FC0
+004E:  BSF    FC0.7
+0050:  BSF    FC2.0
+....................   setup_adc_ports(AN0_TO_AN1);           // Configure AN0 and AN1 as analog inputs 
+0052:  MOVF   FC1,W
+0054:  ANDLW  C0
+0056:  IORLW  0D
+0058:  MOVWF  FC1
+....................   setup_ccp1(CCP_PWM);                   // Configure CCP1 as a PWM 
+005A:  BCF    F94.2
+005C:  BCF    F8B.2
+005E:  MOVLW  0C
+0060:  MOVWF  FBD
+0062:  CLRF   FB7
+0064:  CLRF   FB6
+....................   setup_ccp2(CCP_PWM);                   // Configure CCP2 as a PWM 
+0066:  BCF    F94.1
+0068:  BCF    F8B.1
+006A:  MOVWF  FBA
+....................   setup_timer_2(T2_DIV_BY_1, 32, 16);   // Set PWM frequency to 500Hz 
+006C:  MOVLW  78
+006E:  IORLW  04
+0070:  MOVWF  FCA
+0072:  MOVLW  20
+0074:  MOVWF  FCB
+....................   delay_ms(10);                         // Wait 100ms 
+0076:  MOVLW  0A
+0078:  MOVWF  08
+007A:  RCALL  0004
+....................    
+....................   while(TRUE){ 
+....................    
+....................     set_adc_channel(0);                  // Select channel AN0 
+007C:  MOVLW  00
+007E:  MOVWF  01
+0080:  MOVF   FC2,W
+0082:  ANDLW  C3
+0084:  IORWF  01,W
+0086:  MOVWF  FC2
+....................     delay_ms(1);                         // Wait 1ms 
+0088:  MOVLW  01
+008A:  MOVWF  08
+008C:  RCALL  0004
+....................     i = read_adc();                      // Read from AN0 and store in i 
+008E:  BSF    FC2.1
+0090:  BTFSC  FC2.1
+0092:  BRA    0090
+0094:  MOVFF  FC3,04
+0098:  MOVFF  FC4,05
+....................     delay_ms(1);                         // Wait 1ms 
+009C:  MOVLW  01
+009E:  MOVWF  08
+00A0:  RCALL  0004
+....................     set_adc_channel(1);                  // Select channel AN1 
+00A2:  MOVLW  04
+00A4:  MOVWF  01
+00A6:  MOVF   FC2,W
+00A8:  ANDLW  C3
+00AA:  IORWF  01,W
+00AC:  MOVWF  FC2
+....................     delay_ms(1);                         // Wait 1ms 
+00AE:  MOVLW  01
+00B0:  MOVWF  08
+00B2:  RCALL  0004
+....................     j = read_adc();                      // Read from AN1 and store in j 
+00B4:  BSF    FC2.1
+00B6:  BTFSC  FC2.1
+00B8:  BRA    00B6
+00BA:  MOVFF  FC3,06
+00BE:  MOVFF  FC4,07
+....................     set_pwm1_duty(i);                    // Set pwm1 duty cycle to i 
+00C2:  MOVFF  05,02
+00C6:  MOVFF  04,01
+00CA:  RRCF   02,F
+00CC:  RRCF   01,F
+00CE:  RRCF   02,F
+00D0:  RRCF   01,F
+00D2:  RRCF   02,F
+00D4:  MOVFF  01,FBE
+00D8:  RRCF   02,F
+00DA:  RRCF   02,W
+00DC:  ANDLW  30
+00DE:  MOVWF  00
+00E0:  MOVF   FBD,W
+00E2:  ANDLW  CF
+00E4:  IORWF  00,W
+00E6:  MOVWF  FBD
+....................     set_pwm2_duty(j);                    // Set pwm2 duty cycle to j 
+00E8:  MOVFF  07,02
+00EC:  MOVFF  06,01
+00F0:  RRCF   02,F
+00F2:  RRCF   01,F
+00F4:  RRCF   02,F
+00F6:  RRCF   01,F
+00F8:  RRCF   02,F
+00FA:  MOVFF  01,FBB
+00FE:  RRCF   02,F
+0100:  RRCF   02,W
+0102:  ANDLW  30
+0104:  MOVWF  00
+0106:  MOVF   FBA,W
+0108:  ANDLW  CF
+010A:  IORWF  00,W
+010C:  MOVWF  FBA
+....................     delay_ms(1);                         // Wait 1ms 
+010E:  MOVLW  01
+0110:  MOVWF  08
+0112:  RCALL  0004
+0114:  BRA    007C
+....................      
+....................    } 
+.................... } 
+0116:  SLEEP 
+
+Configuration Fuses:
+   Word  1: C83F   PLL12 CPUDIV4 USBDIV INTRC_IO FCMEN IESO
+   Word  2: 1E3E   PUT BROWNOUT BORV21 VREGEN NOWDT WDT32768
+   Word  3: 0700   CCP2C1 PBADEN LPT1OSC NOMCLR
+   Word  4: 00A1   STVREN NOLVP ICSP2 NOXINST NODEBUG
+   Word  5: C00F   NOPROTECT NOCPB NOCPD
+   Word  6: E00F   NOWRT NOWRTC NOWRTB NOWRTD
+   Word  7: 400F   NOEBTR NOEBTRB

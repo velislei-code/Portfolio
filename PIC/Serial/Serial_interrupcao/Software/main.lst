@@ -1,0 +1,507 @@
+CCS PCM C Compiler, Version 5.008, 5967               20-fev-22 20:48
+
+               Filename:   C:\Users\oi298979\Documents\Proteus\PIC\Serial_interrupcao\Software\main.lst
+
+               ROM used:   353 words (9%)
+                           Largest free fragment is 2048
+               RAM used:   27 (7%) at main() level
+                           56 (15%) worst case
+               Stack used: 3 locations (1 in main + 2 for interrupts)
+               Stack size: 16
+
+*
+0000:  MOVLP  00
+0001:  GOTO   13A
+0002:  NOP
+*
+0004:  CLRF   03
+0005:  MOVLP  00
+0006:  MOVLB  00
+0007:  MOVF   77,W
+0008:  MOVWF  20
+0009:  MOVF   78,W
+000A:  MOVWF  21
+000B:  MOVF   79,W
+000C:  MOVWF  22
+000D:  MOVF   7A,W
+000E:  MOVWF  23
+000F:  CLRF   05
+0010:  MOVLW  91
+0011:  MOVWF  04
+0012:  BTFSS  00.5
+0013:  GOTO   016
+0014:  BTFSC  11.5
+0015:  GOTO   01F
+0016:  MOVF   20,W
+0017:  MOVWF  77
+0018:  MOVF   21,W
+0019:  MOVWF  78
+001A:  MOVF   22,W
+001B:  MOVWF  79
+001C:  MOVF   23,W
+001D:  MOVWF  7A
+001E:  RETFIE
+001F:  MOVLP  00
+0020:  GOTO   06C
+.................... #include <main.h> 
+.................... #include <16F1827.h> 
+.................... //////// Standard Header file for the PIC16F1827 device //////////////// 
+.................... #device PIC16F1827 
+0021:  MOVF   0B,W
+0022:  MOVWF  45
+0023:  BCF    0B.7
+0024:  MOVLB  03
+0025:  BSF    15.7
+0026:  BSF    15.0
+0027:  NOP
+0028:  NOP
+0029:  MOVF   13,W
+002A:  ANDLW  7F
+002B:  BTFSC  03.2
+002C:  GOTO   068
+002D:  MOVLB  00
+002E:  MOVWF  46
+002F:  MOVLB  03
+0030:  MOVF   11,W
+0031:  MOVLB  00
+0032:  MOVWF  47
+0033:  MOVLB  03
+0034:  MOVF   12,W
+0035:  MOVLB  00
+0036:  MOVWF  48
+0037:  MOVF   46,W
+0038:  BTFSS  11.4
+0039:  GOTO   038
+003A:  MOVLB  03
+003B:  MOVWF  1A
+003C:  MOVLB  00
+003D:  MOVF   47,W
+003E:  MOVLB  03
+003F:  MOVWF  11
+0040:  MOVLB  00
+0041:  MOVF   48,W
+0042:  MOVLB  03
+0043:  MOVWF  12
+0044:  BSF    15.7
+0045:  BSF    15.0
+0046:  NOP
+0047:  NOP
+0048:  RLF    13,W
+0049:  RLF    14,W
+004A:  ANDLW  7F
+004B:  BTFSC  03.2
+004C:  GOTO   068
+004D:  MOVLB  00
+004E:  MOVWF  46
+004F:  MOVLB  03
+0050:  MOVF   11,W
+0051:  MOVLB  00
+0052:  MOVWF  47
+0053:  MOVLB  03
+0054:  MOVF   12,W
+0055:  MOVLB  00
+0056:  MOVWF  48
+0057:  MOVF   46,W
+0058:  BTFSS  11.4
+0059:  GOTO   058
+005A:  MOVLB  03
+005B:  MOVWF  1A
+005C:  MOVLB  00
+005D:  MOVF   47,W
+005E:  MOVLB  03
+005F:  MOVWF  11
+0060:  MOVLB  00
+0061:  MOVF   48,W
+0062:  MOVLB  03
+0063:  MOVWF  12
+0064:  INCF   11,F
+0065:  BTFSC  03.2
+0066:  INCF   12,F
+0067:  GOTO   025
+0068:  MOVLB  00
+0069:  BTFSC  45.7
+006A:  BSF    0B.7
+006B:  RETURN
+*
+00C9:  MOVF   00,F
+00CA:  BTFSC  03.2
+00CB:  GOTO   0DC
+00CC:  MOVF   05,W
+00CD:  MOVWF  48
+00CE:  MOVF   04,W
+00CF:  MOVWF  47
+00D0:  MOVF   00,W
+00D1:  BTFSS  11.4
+00D2:  GOTO   0D1
+00D3:  MOVLB  03
+00D4:  MOVWF  1A
+00D5:  MOVLB  00
+00D6:  MOVF   48,W
+00D7:  MOVWF  05
+00D8:  MOVF   47,W
+00D9:  MOVWF  04
+00DA:  ADDFSR 01,FSR0
+00DB:  GOTO   0C9
+*
+00FD:  DATA 3E,1F
+00FE:  DATA 50,18
+00FF:  DATA 00,00
+0100:  DATA 3E,1F
+0101:  DATA D0,18
+0102:  DATA 00,01
+0103:  DATA 3E,1F
+0104:  DATA 50,19
+0105:  DATA 00,01
+0106:  DATA 3E,1F
+0107:  DATA D0,19
+0108:  DATA 00,01
+0109:  RETLW  0A
+010A:  RETLW  0D
+010B:  RETLW  49
+010C:  RETLW  44
+010D:  RETLW  00
+010E:  RETLW  3E
+010F:  RETLW  20
+0110:  RETLW  00
+0111:  DATA 43,34
+0112:  DATA 61,39
+0113:  DATA A0,30
+0114:  DATA 3A,10
+0115:  DATA C1,31
+0116:  DATA 65,37
+0117:  DATA E4,32
+0118:  DATA 21,05
+0119:  DATA 0D,00
+011A:  DATA 43,34
+011B:  DATA 61,39
+011C:  DATA 20,31
+011D:  DATA 3A,10
+011E:  DATA 41,38
+011F:  DATA E1,33
+0120:  DATA E1,10
+0121:  DATA 8A,06
+0122:  DATA 00,00
+....................  
+.................... #list 
+....................  
+.................... #device ADC=16 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES NOMCLR                   //Master Clear pin used for I/O 
+.................... #FUSES NOBROWNOUT               //No brownout reset 
+.................... #FUSES NOLVP                    //No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(clock=4000000,crystal=4MHz) 
+0123:  MOVLW  20
+0124:  MOVWF  05
+0125:  MOVLW  17
+0126:  MOVWF  04
+0127:  MOVF   00,W
+0128:  BTFSC  03.2
+0129:  GOTO   138
+012A:  MOVLW  01
+012B:  MOVWF  78
+012C:  CLRF   77
+012D:  DECFSZ 77,F
+012E:  GOTO   12D
+012F:  DECFSZ 78,F
+0130:  GOTO   12C
+0131:  MOVLW  4A
+0132:  MOVWF  77
+0133:  DECFSZ 77,F
+0134:  GOTO   133
+0135:  GOTO   136
+0136:  DECFSZ 00,F
+0137:  GOTO   12A
+0138:  MOVLP  00
+0139:  GOTO   15D (RETURN)
+.................... #use rs232(baud=2400,parity=N,xmit=PIN_B2,rcv=PIN_B1,bits=8,stream=PORT1) 
+....................  
+....................  
+....................  
+....................  
+....................  
+.................... // ----- Declara Var´s---------------------------------------------------------- 
+....................  
+.................... int iDigNum;                  // Conta num de char-RX 
+.................... char cLinComRX[10];  // Armazena linha de comunicação serial  
+....................                               // Linhas sempre se formaram de #(Inicio), Msg, ;(fim) 
+.................... boolean bResponder;              // Ctrl responder ou não 
+.................... boolean bBusLocalAtivo; 
+.................... char cMyID[5]; 
+....................  
+....................  
+.................... char cRX; 
+....................  
+....................  
+....................  void lerPortaCom(int iPorta); 
+....................  
+....................  
+.................... #INT_RDA // Tem que ficar junto void  RDA_isr(void)  - se não não funciona 
+.................... void  RDA_isr(void)  
+.................... { 
+.................... // Toda vez q o PIC receber algum dado da serial, ele interrompe o programa(while) e 
+.................... // vem aqui(se tiver num delay, sai do delay, exec.aqui e volta pro while 
+....................    /* 
+....................    cRX = getc();     // Recebe na porta Serial 
+....................     
+....................    if(cRX == 'a') {  
+....................       output_high(pin_b0); 
+....................       printf("Char a: Acende!\n\r");   // TX na porta serial 
+....................       
+....................    }        // Liga pino 
+....................    if(cRX == 'b') {  
+....................       output_low(pin_b0);   
+....................       printf("Char b: Apaga!\n\r"); 
+....................    }         // Desliga pino 
+....................     
+....................    */ 
+....................    lerPortaCom(0); 
+*
+006C:  CLRF   38
+*
+00FA:  BCF    11.5
+00FB:  MOVLP  00
+00FC:  GOTO   016
+.................... } 
+....................  
+.................... void main() 
+*
+013A:  MOVLB  03
+013B:  BSF    1F.3
+013C:  MOVLW  A0
+013D:  MOVWF  1B
+013E:  MOVLW  01
+013F:  MOVWF  1C
+0140:  MOVLW  A6
+0141:  MOVWF  1E
+0142:  MOVLW  90
+0143:  MOVWF  1D
+0144:  CLRF   0C
+0145:  CLRF   0D
+0146:  MOVLB  02
+0147:  CLRF   12
+0148:  CLRF   11
+0149:  CLRF   14
+014A:  CLRF   13
+.................... { 
+....................  
+....................    enable_interrupts(INT_RDA); 
+014B:  MOVLB  01
+014C:  BSF    11.5
+....................    enable_interrupts(GLOBAL); 
+014D:  MOVLW  C0
+014E:  IORWF  0B,F
+....................     
+....................    output_high(pin_b0); 
+014F:  BCF    0D.0
+0150:  MOVLB  02
+0151:  BSF    0D.0
+....................  
+....................    while(TRUE) 
+....................    { 
+....................       //TODO: User Code       
+....................       output_toggle(pin_b7); 
+0152:  MOVLB  01
+0153:  BCF    0D.7
+0154:  MOVLW  80
+0155:  MOVLB  02
+0156:  XORWF  0D,F
+....................       delay_ms(1000); 
+0157:  MOVLW  04
+0158:  MOVLB  00
+0159:  MOVWF  36
+015A:  MOVLW  FA
+015B:  MOVWF  37
+015C:  GOTO   123
+015D:  DECFSZ 36,F
+015E:  GOTO   15A
+015F:  MOVLB  02
+0160:  GOTO   152
+....................        
+....................        
+....................    } 
+....................  
+.................... } 
+....................  
+0161:  SLEEP
+....................  
+....................  
+.................... void lerPortaCom(int iPorta){ 
+....................  
+....................   char cRetorna[10]; 
+....................    
+....................    printf(">>P0");  
+*
+006D:  MOVLW  FD
+006E:  MOVLB  03
+006F:  MOVWF  11
+0070:  MOVLW  00
+0071:  MOVWF  12
+0072:  MOVLB  00
+0073:  CALL   021
+....................     
+....................   char cRX = getc();     // Recebe na porta Serial 
+0074:  BTFSS  11.5
+0075:  GOTO   074
+0076:  MOVLB  03
+0077:  MOVF   19,W
+0078:  MOVLB  00
+0079:  MOVWF  43
+....................     
+....................           if(cRX == '['){ 
+007A:  MOVF   43,W
+007B:  SUBLW  5B
+007C:  BTFSS  03.2
+007D:  GOTO   086
+....................           //  limpaLinhaRX();           // Limpa Var com Lina de ComRX 
+....................             iDigNum = 0;              // Char indicativo inicio de linha-Com  
+007E:  CLRF   24
+....................             printf(">>P1");  
+007F:  MOVLW  00
+0080:  MOVLB  03
+0081:  MOVWF  11
+0082:  MOVLW  01
+0083:  MOVWF  12
+0084:  MOVLB  00
+0085:  CALL   021
+....................           }       
+....................  
+....................           if( (cRX != '[')&&(cRX != ']') ){     // Se Char de Inicio e fim de linha, monta a linhaCo 
+0086:  MOVF   43,W
+0087:  SUBLW  5B
+0088:  BTFSC  03.2
+0089:  GOTO   0A0
+008A:  MOVF   43,W
+008B:  SUBLW  5D
+008C:  BTFSC  03.2
+008D:  GOTO   0A0
+....................               //if(!isDigit(cRX)){ 
+....................                 cRX = cRX & ~(0x20);            // Se NÃO for numero...char.toUppercase 
+008E:  BCF    43.5
+....................                   printf(">>P2");  
+008F:  MOVLW  03
+0090:  MOVLB  03
+0091:  MOVWF  11
+0092:  MOVLW  01
+0093:  MOVWF  12
+0094:  MOVLB  00
+0095:  CALL   021
+....................               //} 
+....................               cLinComRX[iDigNum] = cRX;       // Monta Linha 
+0096:  MOVLW  05
+0097:  ADDWF  24,W
+0098:  MOVWF  04
+0099:  MOVLW  20
+009A:  MOVWF  05
+009B:  BTFSC  03.0
+009C:  INCF   05,F
+009D:  MOVF   43,W
+009E:  MOVWF  00
+....................               iDigNum++;                      // Incrementa digto da linha 
+009F:  INCF   24,F
+....................           } 
+....................  
+....................           if(cRX == ']'){                     // Se for fim de linha...imprime no lcd 
+00A0:  MOVF   43,W
+00A1:  SUBLW  5D
+00A2:  BTFSS  03.2
+00A3:  GOTO   0DC
+....................               bResponder = true; 
+00A4:  BSF    2F.0
+....................                  printf(">>P3");  
+00A5:  MOVLW  06
+00A6:  MOVLB  03
+00A7:  MOVWF  11
+00A8:  MOVLW  01
+00A9:  MOVWF  12
+00AA:  MOVLB  00
+00AB:  CALL   021
+....................               char cRxCmd = "Cmd();"; //Comando(cLinComRX);    
+00AC:  MOVLW  43
+00AD:  MOVWF  44
+....................               if(bResponder){ 
+00AE:  BTFSS  2F.0
+00AF:  GOTO   0DC
+....................               
+....................                   bResponder = false;       // Bloqueia p/ evitar resposta repetida                 
+00B0:  BCF    2F.0
+....................                   printf("\n\rID" + cMyID +"> " + cRxCmd);  
+00B1:  MOVLW  01
+00B2:  MOVWF  7A
+00B3:  MOVLW  09
+00B4:  MOVWF  45
+00B5:  MOVF   7A,W
+00B6:  MOVWF  46
+00B7:  MOVLW  10
+00B8:  ADDWF  45,F
+00B9:  MOVLW  20
+00BA:  ADDWFC 46,F
+00BB:  MOVLW  01
+00BC:  MOVWF  7A
+00BD:  MOVLW  0E
+00BE:  ADDWF  45,F
+00BF:  MOVF   7A,W
+00C0:  ADDWFC 46,F
+00C1:  MOVF   44,W
+00C2:  ADDWF  45,F
+00C3:  MOVLW  00
+00C4:  ADDWFC 46,F
+00C5:  MOVF   46,W
+00C6:  MOVWF  05
+00C7:  MOVF   45,W
+00C8:  MOVWF  04
+....................                 
+....................               } 
+....................           } 
+....................            
+....................            
+....................            if(cRX == 'a') {  
+*
+00DC:  MOVF   43,W
+00DD:  SUBLW  61
+00DE:  BTFSS  03.2
+00DF:  GOTO   0EB
+....................       output_high(pin_b0); 
+00E0:  MOVLB  01
+00E1:  BCF    0D.0
+00E2:  MOVLB  02
+00E3:  BSF    0D.0
+....................       printf("Char a: Acende!\n\r");   // TX na porta serial 
+00E4:  MOVLW  11
+00E5:  MOVLB  03
+00E6:  MOVWF  11
+00E7:  MOVLW  01
+00E8:  MOVWF  12
+00E9:  MOVLB  00
+00EA:  CALL   021
+....................       
+....................    }        // Liga pino 
+....................    if(cRX == 'b') {  
+00EB:  MOVF   43,W
+00EC:  SUBLW  62
+00ED:  BTFSS  03.2
+00EE:  GOTO   0FA
+....................       output_low(pin_b0);   
+00EF:  MOVLB  01
+00F0:  BCF    0D.0
+00F1:  MOVLB  02
+00F2:  BCF    0D.0
+....................       printf("Char b: Apaga!\n\r"); 
+00F3:  MOVLW  1A
+00F4:  MOVLB  03
+00F5:  MOVWF  11
+00F6:  MOVLW  01
+00F7:  MOVWF  12
+00F8:  MOVLB  00
+00F9:  CALL   021
+....................    }         // Desl 
+....................   
+.................... } 
+....................  
+....................  
+....................  
+
+Configuration Fuses:
+   Word  1: 3981   XT NOWDT PUT NOMCLR NOPROTECT NOCPD NOBROWNOUT NOCLKOUT IESO FCMEN
+   Word  2: 1EFF   NOWRT PLL_SW STVREN BORV19 NODEBUG NOLVP

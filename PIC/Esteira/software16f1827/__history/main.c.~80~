@@ -1,0 +1,321 @@
+/*
+   Calculos
+      ---------------------------------------------------------  
+      Divisor de tensão
+         R1 = [ (R2 / Vo).Vi ] - R2
+         Vo = +5Vcc
+         Vi = +48Vcc
+         
+         R1 ao +Vcc
+         Centro - saída da medição
+         R2 ao GND
+      ---------------------------------------------------------    
+      Freq. do PWM
+         
+         setup_timer_2(T2_DIV_BY_1, 255, 16);   // = 3906,3 Hz - (..,16) não muda
+      
+         Freq = { 1[ (PR2+1).4.(1/Clock) ] } / T2_DIV_BY
+            
+            PR2(1a255)
+            Clock(do osc do PIC - 4Mhz)
+            T2_DIV_BY(1, 4 ou 16)
+   
+*/
+#include <main.h>
+#include <lcd.c>
+
+
+//#include <16F1827.h>
+//#device ADC = 10
+#fuses NOMCLR INTRC_IO
+#use delay(clock = 8000000)
+ 
+
+
+//#use delay (clock=4000000);
+#fuses HS, NOWDT, PUT, BROWNOUT, NOLVP 
+/*
+   HS: osc a cristal
+   NOWDT: No-Watch dog
+*/
+
+
+// -- Decla variáveis ---
+int16 analogico;                // Var para pegar 10bits(0-1023) da entrada analogica(AN0)-leitura de tensão de saída
+long memVolt;                   // Armazena média de 100 leituras de tensão
+long t_Volts;                   // Armazena tensão em Volts
+
+long memRpm;                   // Armazena média de 100 leituras de tensão
+long f_Rpm;                   // Armazena tensão em Volts
+Boolean bMemPulso;            // Memoriza estado do pulso para comparar e detectar borda descida
+int16 iContaPulso=0;          // Contagem de pulsos de entrada p/ Rpm
+int16 iContaCiclo=0;          // Contagem de ciclos de varredura p/ Rpm
+
+
+unsigned int16 duty1 = 511;     // Inicia duty no meio(0 a 1023)
+
+
+// --- Declara funções ---
+int16 Volts();
+long medias_volt(); 
+
+int16 RPM();
+long medias_Rpm(); 
+long lerPortaAdc(int8 canal);
+Boolean PulsoDetecte(Boolean bPulso);          // Check se Pulso é borada de descida
+float ContaRpm(Boolean bPulso);
+
+
+void main()
+{
+
+   set_tris_a(0x0F);    // Seta Pinos A4 a A7 saída(0000) e A0 a A3 como entrada(1111)(sendo A0eA1 analógica) - ou...set_tris_a(0b00001111); 
+                        // Pinos A0 e A1 são entradas do potenciometro
+                        // Pinos A2eA3 são entradas dos botões(Up e Down)
+                        
+   set_tris_b(0x00);    // LCD - e PWM, Seta pinos B como saída[0x0(0000)0(0000)] ou set_tris_b(0b00000000);
+   
+   //ADCON0 = 0X0F;       // Config os pinos do PortA( como digitais
+   // INTCON2 = 0x7F;   // Habilita os Pull-Ups internos do PortB(0111 1111b)
+   
+   // Seta Pino a5 p/ 1 conectado ao Pino MCLR, com isso põe o MC em modo funcionamento
+   // output_high(PIN_A5); 
+ 
+   //kbd_init(); // teclado
+
+   // Setup PWM
+   setup_oscillator(OSC_1MHZ);           // Set internal oscillator to 8MHz
+   setup_adc(ADC_CLOCK_DIV_8);           // Set ADC conversion time to 8Tosc
+  // setup_adc_ports(AN0_TO_AN1);        // Configure AN0 and AN1 as analog inputs
+  // setup_adc_ports(sAN1);                // Configure AN0 as analog inputs
+   
+   setup_ccp1(CCP_PWM);                   // Configure CCP1 como PWM - Pino 9(RB3)
+   //setup_ccp2(CCP_PWM);                 // Configure CCP2 como PWM - Pino 16(RA7)
+   
+   /*
+      Temos que usar o Timer2 para configurar a frequência pwm
+      Use a seguinte equação para calcular a frequência pwm:
+      Período PWM = [(PR2) + 1] • 4 • Tosc • (Valor de pré-escala TMR2)
+      Onde a frequência PWM é definida como 1 / [período PWM].
+      PR2 é o valor de pré-carga do Timer2,
+      Tosc = 1 / (MCU_frequency) O valor de pré-escala TMR2
+      pode ser 1, 4 ou 16.
+   
+      PWM = (PR2+1).4.(1/CLOCK) -> Clock $Mhz, depende da config no Proj.Wizard
+      Freq = 1/PWM   
+      
+      PWM = (250+1).4.(1/4.000.000)
+      PWM = 1004.0,000.000.25
+      PWM = 0,000.251
+      
+      Freq = 1/PWM
+      Freq = 1/0,000.251
+      Freq = 3.984hz
+      
+      Osc(hz) = Freq / BY_X
+      Osc(hz) = 3984/16
+      Osc(hz) = 249hz     
+      
+      BY_1, 4 ou 16, 1a255, 16 
+      setup_timer_2(T2_DIV_BY_1, 255, 16);    = 4khz      (16x250=4000 -> 4khz/By_1 = 4khz)
+      setup_timer_2(T2_DIV_BY_4, 250, 16);   = 1khz      (16x250=4000 -> 4khz/By_4 = 1khz)
+      setup_timer_2(T2_DIV_BY_16, 250, 16);   = 250hz    (16x250=4000 -> 4khz/By_16 = 250hz)
+    */
+   
+   setup_timer_2(T2_DIV_BY_1, 255, 16);    // Set PWM frequency to 244Hz - 
+   delay_ms(10);                             // Wait 100ms
+
+   setup_adc_ports(sAN1);                 // Config porta AN1(analogica) leitura de tensão
+   setup_adc(ADC_CLOCK_INTERNAL);
+
+  
+
+    lcd_init();
+   
+    printf(lcd_putc,"\f Voltimetro PIC");       // imprimir no lcd (\f limpa o lcd)
+    delay_ms(50);     // atualização de tela a cada X ms
+    
+
+   while(TRUE)
+   {
+   
+   
+   
+      int16 tensao = Volts();
+      int16 iRpm = RPM();
+      float fContaRpm = ContaRpm(input(pin_a4));
+      
+       
+      // PWM-0 - Não esta em uso
+      //set_adc_channel(0);                   // Select channel AN0 - RPM
+      //delay_ms(10);                         // Wait 1ms
+      
+      
+      // PWM 1
+      // Leitura da porta analogica - Tensão de saída
+     // set_adc_channel(1);           // Config entrada analogica 1 que sera lida(entrada 0 esta potenciometro ajuste largura de pulso PWM)
+     // delay_us(10);                 // tempo para seleção
+   
+   
+      /***********************************************************************************************/
+      // Le potenciometro ajustavel
+      //duty1 = read_adc();         // Read from AN0 and store in i - AN0 varia de 0 a 1023
+      duty1 = lerPortaAdc(1);       // Read from AN0 and store in i - AN0 varia de 0 a 1023
+      
+      /********************************** OU...botoes ************************************************/
+      if( input(pin_a2) == 1 ){ 
+         duty1 += 50; 
+         output_high(pin_a4);
+        // delay_ms(10); 
+      }else if( input(pin_a3) == 1 ){ 
+         duty1 -= 50; 
+         output_high(pin_a4);
+         //delay_ms(10); 
+      }else{ output_low(pin_a4); }
+      
+      /***********************************************************************************************/
+      
+     // delay_ms(10);                         // Wait 1ms
+      set_pwm1_duty(duty1);                 // Set pwm1 duty cycle to i
+      delay_ms(10);                         // Wait 1ms
+
+     // Limites
+     if(duty1<=1) duty1=1;
+     if(duty1>=1023) duty1=1023;
+      
+        
+      //set_adc_channel(1);                  // Select channel AN1
+      //delay_ms(1);                         // Wait 1ms
+      // j = read_adc();                      // Read from AN1 and store in j
+      //set_pwm1_duty(i);                    // Set pwm1 duty cycle to i
+      // set_pwm2_duty(j);                    // Set pwm2 duty cycle to j - não uso porta 2
+      //delay_ms(1);                         // Wait 1ms
+        
+     //analogico = read_adc();     // leitura da entrada analogica      
+     // printf("\r\n %lu Vcc \n\r Duty %lu",volts(),duty1);
+      
+      printf(lcd_putc,"\f %lu Vcc - %lu rpm \n\r %lu(Duty)",tensao, iRpm, duty1);        // Lê a entrada da porta analogica(Volt()) e imprimir no lcd (\f limpa o lcd)
+      delay_ms(50);
+     
+   
+   }
+
+}
+
+long lerPortaAdc(int8 canal){
+// faz leitura da porta analogica, retorna valor na porta
+   set_adc_channel(canal);
+   delay_us(20);
+   return read_adc();
+}
+
+Boolean PulsoDetecte(Boolean bPulso){
+// Check se pulso atual é zero, Compara pulso anterior com pulso atual e ve se mudou de 1 p/ 0(Borda de descida
+   if(!bPulso){               // Se agora é falso(Zero)
+      if(bMemPulso){          // Se Pulso anterior(Memorizado) == 1 e agora é zero... borda de descida
+         bMemPulso = bPulso;  // Memoriza estado atual
+         return true; 
+             
+      }else{ 
+         bMemPulso = bPulso;  // Memoriza estado atual
+         return false; 
+      }
+   }else{
+      bMemPulso = bPulso;  // Memoriza estado atual
+      return false; 
+   }
+
+}
+
+float ContaRpm(Boolean bPulso){
+// calcula, conta frequencia de pulsos
+
+   
+   float iFreq = 0;
+   
+   if(PulsoDetecte(bPulso)){
+      
+      iContaPulso++;
+      iContaCiclo++;
+      
+      if(iContaCiclo == 60){
+         iFreq = iContaPulso/60;
+         iContaPulso = 0;
+         iContaCiclo = 0;
+         
+      }
+   
+   }
+   
+   return iFreq;
+
+
+}
+
+
+int16 volts() {
+
+   memVolt = medias_volt();          // Recebe o valor médio da tensão retornando pela função average_volt
+  // memVolt = read_adc();                    // leitura da entrada analogica
+   int16 t_Volts = (memVolt*48)/1023;      // 400 = 40.0 Volt(tensão máx, com 1 decimal) - Converte valor para Volts(1023 Resolução de 10 bits do conversor AD)
+   
+   /* caso se tenha um Voltímetro até 60V:
+    * Reprojetar o divisor de tensão p/ 60V
+    * Alterar calc para:
+    * t_Volts = (store*600)/1023;      
+    */
+   
+   return(t_Volts);
+
+}
+   
+long medias_volt(){                 // Função que calcula a média de 100 leituras de tensão
+                                    // garante maior precisão na medida, se houver alma leitura erronea por ruídos, ele vai corrigir pois retorna a média(100) das leituras
+   unsigned char i;                 // Var de iterações
+   long volt_armazena = 0;          // var local p/ armazenar o valor de tensão
+   
+   for(i=0; i<100; i++){                 // Soma as 100 leituras
+      //volt_armazena += ADC_Read(0);    // Temp_store = temp_store + ADC_Read(0) (Faz soma das 100 leitiras)
+      volt_armazena += lerPortaAdc(1);       // leitura da entrada analogica
+   }
+   
+   return(volt_armazena/100);          // Retorna a media das iterações 
+   
+   
+} // end average_temp
+
+
+
+int16 RPM() {
+
+  // memRPM = medias_RPM();          // Recebe o valor médio da tensão retornando pela função average_volt
+   //memRPM = read_adc();                    // leitura da entrada analogica
+   memRPM = lerPortaAdc(0);       // Read from AN0 and store in i - AN0 varia de 0 a 1023
+   int16 f_Rpm =memRPM; //(memRPM*48)/1023;      // 400 = 40.0 Volt(tensão máx, com 1 decimal) - Converte valor para Volts(1023 Resolução de 10 bits do conversor AD)
+   
+   /* caso se tenha um Voltímetro até 60V:
+    * Reprojetar o divisor de tensão p/ 60V
+    * Alterar calc para:
+    * t_Volts = (store*600)/1023;      
+    */
+   
+   return(f_Rpm);
+
+}
+   
+long medias_RPM(){                 // Função que calcula a média de 100 leituras de tensão
+                                    // garante maior precisão na medida, se houver alma leitura erronea por ruídos, ele vai corrigir pois retorna a média(100) das leituras
+   unsigned char i;                 // Var de iterações
+   long rpm_armazena = 0;          // var local p/ armazenar o valor de tensão
+   
+   for(i=0; i<100; i++){                 // Soma as 100 leituras
+      //volt_armazena += ADC_Read(0);    // Temp_store = temp_store + ADC_Read(0) (Faz soma das 100 leitiras)
+      rpm_armazena += read_adc();       // leitura da entrada analogica
+   }
+   
+   return(rpm_armazena/100);          // Retorna a media das iterações 
+   
+   
+} // end average_temp
+
+

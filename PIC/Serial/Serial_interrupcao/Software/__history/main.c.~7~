@@ -1,0 +1,40 @@
+#include <main.h>
+
+char cRX;
+
+#INT_RDA
+void  RDA_isr(void) 
+{
+// Toda vez q o PIC receber algum dado da serial, ele interrompe o programa(while) e
+// vem aqui(se tiver num delay, sai do delay, exec.aqui e volta pro while
+   
+   cRX = getc();     // Recebe na porta Serial
+   
+   if(cRX == 'a') { 
+      output_high(pin_b0);
+      printf("Char a: Acende!\n\r");   // TX na porta serial
+     
+   }        // Liga pino
+   if(cRX == 'b') { 
+      output_low(pin_b0);  
+      printf("Char b: Apaga!\n\r");
+   }         // Desliga pino
+   
+}
+
+void main()
+{
+
+   enable_interrupts(INT_RDA);
+   enable_interrupts(GLOBAL);
+
+   while(TRUE)
+   {
+      //TODO: User Code      
+      output_toggle(pin_b7);
+      delay_ms(1000);
+      
+      
+   }
+
+}

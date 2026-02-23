@@ -1,0 +1,48 @@
+ÀÄprjGarrafaH2_16F676
+   ÃÄMAIN  0/135  Ram=2
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÃÄ@delay_ms1  0/20  Ram=1
+   ³  ÃÄinicializar  0/13  Ram=0
+   ³  ÃÄAterrar  0/15  Ram=0
+   ³  ³  ÀÄ@delay_ms1  0/20  Ram=1
+   ³  ÃÄcheckPressBtn  0/57  Ram=2
+   ³  ³  ÃÄbuzzer  0/22  Ram=2
+   ³  ³  ³  ÃÄ@delay_ms1  0/20  Ram=1
+   ³  ³  ³  ÀÄ@delay_ms1  0/20  Ram=1
+   ³  ³  ÀÄbuzzer  0/22  Ram=2
+   ³  ³     ÀÄ*
+   ³  ÃÄStart  0/16  Ram=0
+   ³  ³  ÀÄPoloPN  0/15  Ram=0
+   ³  ³     ÀÄ@delay_ms1  0/20  Ram=1
+   ³  ÃÄcheckBordaUpBtn  0/54  Ram=2
+   ³  ÀÄ@delay_ms1  0/20  Ram=1
+   ÀÄinterrupt  0/143  Ram=0
+      ÀÄClock_PIC  (Inline)  Ram=0
+         ÃÄpiscaLED  0/70  Ram=3
+         ³  ÃÄ@delay_ms1  0/20  Ram=1
+         ³  ÀÄ@delay_ms1  0/20  Ram=1
+         ÃÄpiscaLED  0/70  Ram=3
+         ³  ÀÄ*
+         ÃÄpiscaLED  0/70  Ram=3
+         ³  ÀÄ*
+         ÃÄPoloPN  0/15  Ram=0
+         ³  ÀÄ*
+         ÃÄ@delay_ms1  0/20  Ram=1
+         ÃÄPoloNP  (Inline)  Ram=0
+         ³  ÀÄ@delay_ms1  0/20  Ram=1
+         ÃÄ@delay_ms1  0/20  Ram=1
+         ÃÄ@MUL88  0/37  Ram=2
+         ÃÄbuzzer  0/22  Ram=2
+         ³  ÀÄ*
+         ÃÄStop  0/20  Ram=0
+         ³  ÀÄAterrar  0/15  Ram=0
+         ³     ÀÄ*
+         ÃÄzerarClock  0/4  Ram=0
+         ÃÄ@MUL88  0/37  Ram=2
+         ÃÄStop  0/20  Ram=0
+         ³  ÀÄ*
+         ÃÄStop  0/20  Ram=0
+         ³  ÀÄ*
+         ÃÄbuzzer  0/22  Ram=2
+         ³  ÀÄ*
+         ÀÄzerarClock  0/4  Ram=0

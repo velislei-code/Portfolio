@@ -1,0 +1,410 @@
+#include <main.h>
+
+
+
+
+// =============================================================================================================
+// --- Mapeamento de Hardware ---
+#define defTime       1
+#define defTamLinRX   15     
+#define defBusLocal 0
+#define defBusRem   1
+#define defPorta    0
+
+// ----- Declar Var-Constantes ------------------------------------------------
+const char cCI[5] = "PIC";
+const char cMod[10] = "16F1827";
+const char cMsgFail[20] = "Erro, cmd inv";
+
+// ----- Declara Var´s---------------------------------------------------------
+int iDigNum;                  // Conta num de char-RX
+char cLinComRX[defTamLinRX];  // Armazena linha de comunicação serial, linhas sempre se formaram de \(Inicio), Msg, ;(fim)
+boolean bPrompt;              // Ctrl responder ou não
+boolean bBusLocalAtivo;       // Ctrl-info Bus conectado
+char cMyID[3];                // Endereço da placa
+
+//char cRX;                     
+
+// ---- Declara funções --------------------------------------------------------
+void _init();                    // Inicia variáveis
+void help();                     // Lista comandos
+void lerPortaCom(int iPorta);    // Escuta eventos da porta com
+char Comando(char xLinRX);       // Interpretador de comandos Terminal
+void fixarBUS(int iBus);         // Fixa Bus em local ou remoto
+void reset();
+  
+
+char FuncaoPinAtmega328p(char sP);
+int PinAtmega328pToArduino(char sP);
+
+
+// Trata da interrupção
+#INT_RDA          // Tem que ficar junto void  RDA_isr(void)  - se não não funciona
+void  RDA_isr(void) 
+{
+// Toda vez q o PIC receber algum dado da serial, ele interrompe o programa(while) e
+// vem aqui(se tiver num delay, sai do delay, exec.aqui e volta pro while
+  
+   lerPortaCom(0);
+  
+}
+
+void main()
+{
+
+   enable_interrupts(INT_RDA);
+   enable_interrupts(GLOBAL);
+   
+   _init();
+   
+  
+
+   while(TRUE)
+   {
+      //TODO: User Code      
+      //output_toggle(pin_b0);
+      delay_ms(300);
+      
+      
+   }
+
+}
+
+void _init(){
+     
+     output_high(pin_B0);              // Coloca pino B0_conectado ao MCLR em 1(funcionamento) 
+     cMyID[0] = '0';                    // My endereço Inicial
+     cMyID[1] = '0';
+     fixarBus(defBusLocal);            // habilita TX-Local, conecta ao BUS    
+     bPrompt = true;                   // Exibe Prompt, na realidade é uma mensagem-serial do MC ao terminal 
+     printf("%s%s> ", cCI, cMyID);     // imprime prompt de comando   
+   
+}
+
+void lerPortaCom(int iPorta){
+
+
+  
+   // printf(">>P0"); 
+   
+  char cRX = getc();     // Recebe na porta Serial
+   
+          if(cRX == '\\'){
+          //  limpaLinhaRX();           // Limpa Var com Lina de ComRX
+            iDigNum = 0;              // Char indicativo inicio de linha-Com 
+           // printf(">>P1\r\n"); 
+          }      
+
+          if( (cRX != '\\')&&(cRX != ';') ){     // Se Char de Inicio e fim de linha, monta a linhaCo
+             // if(!isDigit(cRX)){
+                cRX = cRX & ~(0x20);            // Se NÃO for numero...char.toUppercase
+                  // printf(">>P2\r\n"); 
+              //}
+              cLinComRX[iDigNum] = cRX;       // Monta Linha
+              iDigNum++;                      // Incrementa digto da linha
+          }
+
+          if(cRX == ';'){                     // Se for fim de linha...imprime no lcd
+                
+              char cRxCmd = cMsgFail;
+              bPrompt = true;
+             // printf("\r\nL1: |%s| \r\n", cMyID); 
+               // Rotina pra limitar tamanho do cmd digitado pelo usuário
+              if((iDigNum>3)&&(iDigNum<defTamLinRX)){  
+                     cRxCmd = Comando(cLinComRX); 
+                     if(bPrompt){            
+                           //limparBufferLinRX();       
+                           memset (cLinComRX, '\0', sizeof(cLinComRX)); // \0 = ''
+                           memset(cRX,'\0',sizeof(cRX)); 
+                           delay_ms(100);
+                           bPrompt = false;                          // Bloqueia p/ evitar resposta repetida                
+                           printf("%s%c%c> %s", cCI, cMyID[0], cMyID[1], cRxCmd);   // prompt de comando    
+                     }
+                     memset(cRxCmd,'\0',sizeof(cRxCmd));
+              }else{ printf("\r\n%s%c%c# %s - e101\r\n", cCI, cMyID[0], cMyID[1], cMsgFail); }
+             
+          }
+ 
+}
+
+char Comando(char xLinRX){
+
+         const int iTmpLocal = 100;         
+         char cRes[defTamLinRX] = "";//cMsgFail; // resposta default é NAK, não compreendido
+   
+        // \SHxxx; Mostrar estado de: 
+        if( (cLinComRX[0] == 'H')&&(cLinComRX[1] == 'E')&&(cLinComRX[2] == 'L')&&(cLinComRX[3] == 'P') ){
+               help();  // Lista comandos da library      
+                
+        }
+        //--------------------- Ini-Show -----------------------------------------------------------// 
+        // \SHxxx; Mostrar estado de: 
+        else if( (cLinComRX[0] == 'S')&&(cLinComRX[1] == 'H') ){
+          // printf("\r\nSH1: |%c|%c|%c| \r\n", cMyID[0], cMyID[1], cMyID[2]); 
+              // \ShAdr; Mostra endereço ID do MC
+              if( (cLinComRX[2] == 'A')&&(cLinComRX[3] == 'D')&&(cLinComRX[4] == 'R') ){                      
+                 /* cRes[0] = 'S';  cRes[1] = 'H'; cRes[2] = 'A';  cRes[3] = 'D'; cRes[4] = 'R';
+                    printf("\r\nID%c%c# ShADR", cMyID[0], cMyID[1]); // CHEGOU AKI - OK!              */
+                    cRes[0] = cMyID[0]; cRes[1] = cMyID[1]; cRes[3] = ' '; cRes[4] = ' ';        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                    printf("\r\n%s%c%c# |%c|%c|\r\n", cCI, cMyID[0], cMyID[1],  cMyID[0], cMyID[1]);        // Devido sujeira no Buffer(não consegui limpar) tive de usar cMyID[0]...                 
+                    delay_ms(iTmpLocal);  
+              } 
+              // \ShMod; Mostra modelo do MC
+              else if( (cLinComRX[2] == 'H')&&(cLinComRX[3] == 'D')&&(cLinComRX[4] == 'W') ){                      
+                 /* cRes[0] = 'S';  cRes[1] = 'H'; cRes[2] = 'A';  cRes[3] = 'D'; cRes[4] = 'R';
+                    printf("\r\nID%c%c# ShADR", cMyID[0], cMyID[1]); // CHEGOU AKI - OK!              */
+                    cRes = cMod;
+                    //printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);    
+                    printf("\r\n%s%c%c# %s\r\n", cCI, cMyID[0], cMyID[1],  cRes); 
+                    delay_ms(iTmpLocal);  
+              } 
+              // \ShBuf; Mostra o conteúdo da linha-Com RX
+              else if( (cLinComRX[2] == 'B')&&(cLinComRX[3] == 'U')&&(cLinComRX[4] == 'F') ){                      
+                    
+                    for(int b=0; b<defTamLinRX; b++){ cRes[b] = cLinComRX[b]; }  // L~e conteudo da LinComRX                    
+                    printf("\r\n%s%c%c# %s\r\n", cCI, cMyID[0], cMyID[1],  cRes);                       
+                    delay_ms(iTmpLocal);  
+              }                
+              else{  printf("\r\n%s%c%c# %s - e106\r\n", cCI, cMyID[0], cMyID[1],  cMsgFail);     }
+              
+              
+        }   // If(SH...)...show
+        //--------------------- Fim-Show -----------------------------------------------------------// 
+        
+        // Comandos de config
+        // \ADRxxx; Config/Atribui um endereço ao MC
+        else if( (cMyID[0] == '0')&&(cMyID[1] == '0') || (cMyID="") ){
+        //printf("\r\nAD1: |%c|%c|%c| \r\n", cMyID[0], cMyID[1], cMyID[2]); 
+              if( (cLinComRX[0] == 'A')&&(cLinComRX[1] == 'D')&&(cLinComRX[2] == 'R') ){
+                  
+                  cMyID="";
+                  memset(cMyID,'\0', sizeof(cMyID));   // Limpar Buffer cMyID(\0 equivale a '', vazio)
+                  cMyID[0]=cLinComRX[3]; 
+                  cMyID[1]=cLinComRX[4];
+                  //cMyID[2]=cLinComRX[5];
+                 
+                  
+                  cRes[0] = cMyID[0]; cRes[1] = cMyID[1]; //cRes[2] = cMyID[2];        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                  //printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);    
+                  printf("\r\n%s%c%c# %s\r\n", cCI, cMyID[0], cMyID[1],  cRes);   // Limita show-MyID a 3 Dig
+                  delay_ms(iTmpLocal);  
+              }else{  printf("\r\n%s%c%c# %s - e107\r\n", cCI, cMyID[0], cMyID[1],  cMsgFail);     }
+           
+          }
+          
+          // \AdrFxxx -  Config/Atribui um endereço ao MC de forma forçada - independe se é 000
+          else if( (cLinComRX[0] == 'A')&&(cLinComRX[1] == 'D')&&(cLinComRX[2] == 'R')&&(cLinComRX[3] == 'F') ){
+                  
+                  //cMyID="";
+                  //memset(cMyID,'\0', sizeof(cMyID));   // Limpar Buffer cMyID(\0 equivale a '', vazio)
+                  
+                 // cMyID[0]=cLinComRX[4];
+                 // cMyID[1]=cLinComRX[5];
+                  cMyID = String(cLinComRX[4]) + String(cLinComRX[5]);
+                 
+                  
+                  cRes[0] = cMyID[0]; cRes[1] = cMyID[1]; //cRes[2] = cMyID[2];        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                  //printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);    
+                  printf("\r\n%s%c%c# %s\r\n", cCI, cMyID[0], cMyID[1],  cRes);   // Limita show-MyID a 3 Dig
+                  delay_ms(iTmpLocal);  
+          }
+           
+           
+            
+          // \CLRxxx; Zerar um endereço ao MC
+          else if( (cLinComRX[0] == 'C')&&(cLinComRX[1] == 'L')&&(cLinComRX[2] == 'R')&&(cLinComRX[3] == cMyID[0])&&(cLinComRX[4] == cMyID[1]) ){
+         
+               // if( (cLinComRX[3] == cMyID[0])&&(cLinComRX[4] == cMyID[1])&&(cLinComRX[5] == cMyID[2]) ){
+                // Zera endereço  
+                   /*  cMyID[0]='0'; 
+                     cMyID[1]='0';
+                     cMyID[2]='0';  */
+                printf("\r\nP2: |%c|%c| \r\n", cMyID[0], cMyID[1]); 
+                
+                     cMyID[2]="000";
+                     cRes[0] = cMyID[0]; cRes[1] = cMyID[1]; //cRes[2] = cMyID[2];        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                     printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);  
+                /*
+                // \ClrF; Zerar um endereço do MC forcado
+                }else if( (cLinComRX[3] == 'F') ){
+                  
+               printf("\r\nP3: |%c|%c|%c| \r\n", cMyID[0], cMyID[1], cMyID[2]); 
+               
+                     cMyID[0]='0'; 
+                     cMyID[1]='0';
+                     cMyID[2]='0';
+                     cRes[0] = cMyID[0]; cRes[1] = cMyID[1]; cRes[2] = cMyID[2];        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                     printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);  
+                
+                }else{  printf("\r\n%s%c%c# %s - e108\r\n", cCI, cMyID[0], cMyID[1],  cMsgFail);    }
+               */      
+                delay_ms(iTmpLocal);  
+            }
+
+          
+            // \CLRxxx; Zerar um endereço ao MC
+          else if( (cLinComRX[0] == 'R')&&(cLinComRX[1] == 'S')&&(cLinComRX[2] == 'T') ){
+          
+                  printf("\r\n %c%c   \r\n", cMyID[0], cMyID[1]); 
+           
+                if( (cLinComRX[3] == cMyID[0])&&(cLinComRX[4] == cMyID[1]) ){
+                     
+                     cRes[0] = cMyID[0]; cRes[1] = cMyID[1]; //cRes[2] = cMyID[2];        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                     printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);  
+                     reset();
+                     
+                }else  if(cLinComRX[3] == 'F'){
+                     
+                     cRes[0] = cMyID[0]; cRes[1] = cMyID[1];// cRes[2] = cMyID[2];        // Usei tipo char pq cMyID estava dando erro: "var somente leitura"
+                     printf("\r\n%s%s# %s\r\n", cCI, cMyID, cRes);  
+                     reset();
+                   
+                }else{  printf("\r\n%s%c%c# %s- e110a\r\n", cCI, cMyID[0], cMyID[1],  cMsgFail);    }
+                     
+                delay_ms(iTmpLocal);  
+          }
+          
+          //else{  printf("\r\n%s%c%c# %s - e110b\r\n", cCI, cMyID[0], cMyID[1],  cMsgFail);    }
+          else{  printf("\r\n%s%s# %s - e110b\r\n", cCI, cMyID, cMsgFail);    }
+              
+              
+        return cRes;
+
+}
+
+
+int PinAtmega328pToArduino(char sP){
+    // Converte id-pinos Atmega328p p/ id-arduino
+
+    int iRes = 100;     // Default Retorna num.nulo 
+
+    //         CI         ARDUINO             CI   
+    // Pinos digitais  
+    if(sP == "PB0"){ iRes = 8; }         //  14       
+    else if(sP == "PB1"){ iRes = 9; }    //  15  
+    else if(sP == "PB2"){ iRes = 10; }   //  16
+    else if(sP == "PB3"){ iRes = 11; }   //  17
+    else if(sP == "PB4"){ iRes = 12; }   //  18
+    else if(sP == "PB5"){ iRes = 13; }   //  19
+    else if(sP == "PB6"){ iRes = 101; }  //   9         Não disponivel no arduino
+    else if(sP == "PB7"){ iRes = 102; }  //  10         Não disponível no arduino
+
+    // Pinos Analógicos
+    else if(sP == "PC0"){ iRes = 14; }   //  23        A0
+    else if(sP == "PC1"){ iRes = 15; }   //  24        A1
+    else if(sP == "PC2"){ iRes = 16; }   //  25        A2
+    else if(sP == "PC3"){ iRes = 17; }   //  26        A3
+    else if(sP == "PC4"){ iRes = 18; }   //  27        A4
+    else if(sP == "PC5"){ iRes = 19; }   //  28        A5
+    else if(sP == "PC6"){ iRes = 1; }    //  01        A6  RESET     
+    else if(sP == "PC7"){ iRes = 103; }  //            A7
+
+    else if(sP == "PD0"){ iRes = 0; }    //  02        RX
+    else if(sP == "PD1"){ iRes = 1; }    //  03        TX
+    else if(sP == "PD2"){ iRes = 2; }    //  04        
+    else if(sP == "PD3"){ iRes = 3; }    //  05
+    else if(sP == "PD4"){ iRes = 4; }    //  06
+    else if(sP == "PD5"){ iRes = 5; }    //  11
+    else if(sP == "PD6"){ iRes = 6; }    //  12
+    else if(sP == "PD7"){ iRes = 7; }    //  13  
+
+    else{ iRes = 100; }
+
+
+    return iRes;
+
+}
+
+char FuncaoPinAtmega328p(char sP){
+    // Converte id-pinos Atmega328p p/ id-arduino
+
+    char sRes = "Null";     // Default Retorna num.nulo 
+
+    //         CI         ARDUINO              CI   
+    // Pinos digitais  
+    if(sP == "PB0"){ sRes = "Btn"; }            //  14       
+    else if(sP == "PB1"){ sRes = "Ctrl-RST"; }  //  15  
+    else if(sP == "PB2"){ sRes = "NC"; }        //  16
+    else if(sP == "PB3"){ sRes = "LCD-RS"; }    //  17
+    else if(sP == "PB4"){ sRes = "LCD-EN"; }    //  18
+    else if(sP == "PB5"){ sRes = "NC"; }        //  19
+    else if(sP == "PB6"){ sRes = "NC"; }        //   9         Não disponivel no arduino
+    else if(sP == "PB7"){ sRes = "NC"; }        //  10         Não disponível no arduino
+
+    // Pinos Analógicos
+    else if(sP == "PC0"){ sRes = "NC"; }   //  23        A0
+    else if(sP == "PC1"){ sRes = "NC"; }   //  24        A1
+    else if(sP == "PC2"){ sRes = "NC"; }   //  25        A2
+    else if(sP == "PC3"){ sRes = "NC"; }   //  26        A3
+    else if(sP == "PC4"){ sRes = "NC"; }   //  27        A4
+    else if(sP == "PC5"){ sRes = "NC"; }   //  28        A5
+    else if(sP == "PC6"){ sRes = "RST"; }  //  01        A6  RESET     
+    else if(sP == "PC7"){ sRes = "ND"; }   //            A7
+
+    else if(sP == "PD0"){ sRes = "RX"; }            //  02        RX
+    else if(sP == "PD1"){ sRes = "TX"; }            //  03        TX
+    else if(sP == "PD2"){ sRes = "EnBus-Loc"; }     //  04        
+    else if(sP == "PD3"){ sRes = "EnBus-Rem"; }     //  05
+    else if(sP == "PD4"){ sRes = "LCD-D7"; }        //  06
+    else if(sP == "PD5"){ sRes = "LCD-D6"; }        //  11
+    else if(sP == "PD6"){ sRes = "LCD-D5"; }        //  12
+    else if(sP == "PD7"){ sRes = "LCD-D4"; }        //  13  
+
+    else{ sRes = "Null"; }
+
+
+    return sRes;
+
+
+
+}
+
+
+void reset(){  
+   output_low(pin_B0); 
+   //delay_ms(1000);
+   //output_high(pin_B0);
+}
+
+
+void fixarBUS(int iBus){
+// Ctrl BUS de TX/RX, Local ou Remoto  
+
+    if(iBus == defBusLocal){ 
+        output_low(pin_B6);      // Pin(RB6) em Low habilita(Conecta) 74LS244 p/ conexão com Barramento - TX-Local Transmite
+        output_high(pin_B7);     // Pin(RB7) em high Desabilita(Abre) 74LS244 p/ conexão com Barramento - Abre-Bus TX Remoto
+        bBusLocalAtivo = true;
+    }else if(iBus == defBusRem){ 
+        output_high(pin_B6);    // Pin(RB6) em high Desabilita(Abre) 74LS244 p/ conexão com Barramento - Abre-Bus TX Local
+        output_low(pin_B7);     // Pin(RB7) em Low habilita(Conecta) 74LS244 p/ conexão com Barramento - TX-Remoto Transmite
+        bBusLocalAtivo = false;
+    }else{
+        output_low(pin_B6);      // Pin(RB6) em Low habilita(Conecta) 74LS244 p/ conexão com Barramento - TX-Local Transmite
+        output_high(pin_B7);     // Pin(RB7) em high Desabilita(Abre) 74LS244 p/ conexão com Barramento - Abre-Bus TX Remoto
+        
+        bBusLocalAtivo = true;
+    }
+
+
+}
+
+void help(){
+
+// Lista de comandos
+   char cHa[40]= "ShAdr, ShHdw, ShBuf,"; 
+   char cHb[40]= "Adr456, AdrF456, Clr456, ClrF, Rst456";
+   char cHc[40]= "RstF";
+/*  
+   //printf("\r\n%s%s#\r\n", cCI, cMyID);  
+   //for(int h=0; h<10; h++){  
+  // for(int hc=0; hc<25; hc++){ */
+      printf("\r\n%s%s# %s", cCI, cMyID, cHa);
+      printf("\n\r        %s", cHb);
+      printf("\n\r        %s\n\r", cHc);
+   //}}
+
+
+
+}
+
+

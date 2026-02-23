@@ -1,0 +1,39 @@
+//#include <18f2550.h>  
+#include <16f1827.h>    
+#include <string.h>
+#use delay(crystal=4Mhz)
+
+#FUSES HS
+#FUSES NOPROTECT
+#FUSES NOPUT
+#FUSES NOWDT
+#FUSES MCLR
+
+//#USE RS232(UART1, BAUD=9600, XMIT=PIN_C6, RCV=PIN_C7, PARITY=N, STOP=1, ENABLE=PIN_B0)  //18F2550 ¨pin_RC6 = TX, pin_RC7=RX
+#USE RS232(UART1, BAUD=9600, XMIT=PIN_B1, RCV=PIN_B2, PARITY=N, STOP=1, ENABLE=PIN_B0)    //16F1827 pin_RB1=TX, pin_RB2=RX - se mudar isto(os pinos) da erro    
+
+
+// Usar portas de entradas e saídas(TXD/RXD) default
+#USE standard_io(a)
+#USE standard_io(b)
+
+void main()
+{
+   char ch;
+   
+   while(true)
+   {
+      getc();
+      ch=getc();
+      
+      if((ch=='m')){
+         output_high(pin_B3);
+      }
+   
+   
+   
+   }
+   
+   
+
+}

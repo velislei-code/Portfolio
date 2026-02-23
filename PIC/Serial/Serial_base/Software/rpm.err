@@ -1,0 +1,7 @@
+*** Error 12 "rpm.c" Line 41(23,24): Undefined identifier  -- uart1_init
+*** Error 12 "rpm.c" Line 44(20,21): Undefined identifier  -- lcd_cmd
+*** Error 12 "rpm.c" Line 48(33,34): Undefined identifier  -- uart1_data_ready
+*** Error 12 "rpm.c" Line 50(34,35): Undefined identifier  -- uart1_read
+*** Error 12 "rpm.c" Line 51(26,27): Undefined identifier  -- lcd_chr_CP
+      5 Errors,  0 Warnings.
+Build Failed.

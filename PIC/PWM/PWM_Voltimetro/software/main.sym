@@ -1,0 +1,148 @@
+004-005 @WRITE_PROGRAM_MEMORY8.P1
+004-005 @WRITE_PACKED_MEMORY.P2
+004-005 @READ_PACKED_MEMORY.P3
+004-005 @READ_PROGRAM_MEMORY8.P4
+006-007 @READ_PACKED_MEMORY.P1
+006-007 @WRITE_PACKED_MEMORY.P2
+00D     lcd
+00D     lcdlat
+020-021 analogico
+022-023 memVolt
+024-025 t_Volts
+026-027 duty1
+028-029 MAIN.tensao
+02A-033 MAIN.msg
+034     @delay_ms2.P1
+034     @PSTRINGCN7_669.P2
+034-035 @PRINTF_LU_669.P3
+034     lcd_init.i
+034-035 Volts.t_Volts
+034     MAIN.@SCRATCH1
+034     @PSTRINGC7_669.@SCRATCH1
+034     @PSTRINGR_669.@SCRATCH1
+035     lcd_init.@SCRATCH1
+035     MAIN.@SCRATCH2
+035     @PSTRINGC7_669.@SCRATCH2
+035     @PSTRINGCN7_669.@SCRATCH1
+035     @PSTRINGR_669.@SCRATCH2
+036     medias_volt.i
+036-037 @MUL1616.P1
+036     @PSTRINGC7_669.@SCRATCH3
+036     @PRINTF_LU_669.@SCRATCH1
+036     @PSTRINGCN7_669.@SCRATCH2
+036     Volts.@SCRATCH1
+037-038 medias_volt.volt_armazena
+037     @PSTRINGC7_669.@SCRATCH4
+037     @PRINTF_LU_669.@SCRATCH2
+037     @PSTRINGCN7_669.@SCRATCH3
+037     Volts.@SCRATCH2
+038-039 @MUL1616.P1
+038     @PRINTF_LU_669.@SCRATCH3
+038     @PSTRINGCN7_669.@SCRATCH4
+039-03A @DIV1616.P1
+039     @PRINTF_LU_669.@SCRATCH4
+03A     @PRINTF_LU_669.@SCRATCH5
+03A     @MUL1616.@SCRATCH1
+03B-03C @DIV1616.P1
+03B     @PRINTF_LU_669.@SCRATCH6
+03C     @PRINTF_LU_669.@SCRATCH7
+03D     lcd_putc.c
+03D     @DIV1616.@SCRATCH1
+03E     @delay_ms1.P1
+03E     lcd_gotoxy.x
+03F     lcd_gotoxy.y
+040     lcd_gotoxy.address
+041     lcd_gotoxy.@SCRATCH1
+042     lcd_send_byte.address
+043     lcd_send_byte.n
+044     lcd_read_byte.low
+044     lcd_send_byte.@SCRATCH1
+045     lcd_read_byte.high
+045     lcd_send_nibble.n
+046     lcd_read_byte.@SCRATCH1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+08D     lcdtris
+111.6   C1OUT
+113.6   C2OUT
+191-192 @WRITE_PROGRAM_MEMORY8.P1
+191-192 @READ_PROGRAM_MEMORY8.P2
+291     CCP_1
+291     CCP_1_LOW
+292     CCP_1_HIGH
+298     CCP_2_LOW
+298     CCP_2
+299     CCP_2_HIGH
+311     CCP_3
+311     CCP_3_LOW
+312     CCP_3_HIGH
+318     CCP_4_LOW
+318     CCP_4
+319     CCP_4_HIGH
+
+ROM Allocation:
+000003  LCD_INIT_STRING.call
+000004  LCD_INIT_STRING.data
+000008  @const698.call
+00000D  @const699.call
+000011  @const700.call
+000015  @const694.call
+00001E  @const701.call
+00002B  @delay_ms2
+000040  @delay_ms1
+000056  lcd_send_nibble
+000062  lcd_read_nibble
+000068  lcd_send_byte
+00006E  lcd_read_byte
+0000A8  lcd_init
+0000DA  lcd_gotoxy
+0000EC  lcd_putc
+000118  @PSTRINGC7_669
+00015E  @DIV1616
+000183  medias_volt
+000183  Volts
+0001B2  @MUL1616
+0001DD  @PRINTF_LU_669
+00023B  @PSTRINGCN7_669
+000288  @PSTRINGR_669
+00029A  @cinit1
+00029A  MAIN
+0002AA  @cinit2
+
+Project Directory:
+    D:\Projetos\PIC\PIC\PWM\PWM_Voltimetro\software\
+
+Project Files:
+    main.c                                                  [13-set-21 10:51  CRC=0CC97FC4]
+    main.h                                                  [05-set-21 18:01  CRC=B723CC71]
+    C:\Program Files (x86)\PICC\Devices\16F1827.h           [03-jul-13 14:28  CRC=CC443070]
+    C:\Program Files (x86)\PICC\Drivers\lcd.c               [23-ago-12 09:01  CRC=D28E8746]
+
+Source signature=354E8B31
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC16F1827
+    Pointer Size:   16
+    ADC Range:      0-1023
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Enhanced 16:    Yes
+
+Output Files:
+    XREF file:   main.xsym
+    Errors:      main.err
+    Ext Symbols: main.esym
+    INHX8:       main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA

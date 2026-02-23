@@ -1,0 +1,27 @@
+#include <main.h>
+
+#include <lcd.c>
+
+int16 analogico;     // var para pegar 10bits(0-1023) da entrada analogica
+
+
+void main()
+{
+   setup_adc_ports(sAN0);
+   setup_adc(ADC_CLOCK_INTERNAL);
+
+   lcd_init();
+
+   while(TRUE)
+   {
+     
+      set_adc_channel(0);           // Config qual entrada analogica sera lida
+      delay_us(10);                 // tempo para seleção
+      analogico = read_adc();       // leitura da entrda analogica
+      
+      delay_ms(100);                // atualização de lcd 
+      
+      
+   }
+
+}

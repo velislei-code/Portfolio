@@ -1,0 +1,11 @@
+*** Error 12 "main.c" Line 8(1,6): Undefined identifier   ANSEL
+*** Error 12 "main.c" Line 9(1,7): Undefined identifier   ANSELH
+*** Error 12 "main.c" Line 11(11,12): Undefined identifier  -- UART1_Init
+*** Error 12 "main.c" Line 14(17,18): Undefined identifier  -- UART1_Write_Text
+*** Error 12 "main.c" Line 15(12,13): Undefined identifier  -- UART1_Write
+*** Error 12 "main.c" Line 16(12,13): Undefined identifier  -- UART1_Write
+*** Error 12 "main.c" Line 19(21,22): Undefined identifier  -- UART1_Data_Ready
+*** Error 12 "main.c" Line 20(1,8): Undefined identifier   uart_rd
+*** Error 12 "main.c" Line 21(12,13): Undefined identifier  -- UART1_Write
+      9 Errors,  0 Warnings.
+Build Failed.

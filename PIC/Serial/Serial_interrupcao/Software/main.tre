@@ -1,0 +1,13 @@
+ÀÄmain
+   ÃÄMAIN  0/40  Ram=1
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÀÄ@delay_ms1  0/23  Ram=1
+   ÀÄRDA_isr  0/145  Ram=0
+      ÀÄlerPortaCom  (Inline)  Ram=15
+         ÃÄ@PSTRINGC7_2400_106_105  0/75  Ram=4
+         ÃÄ@PSTRINGC7_2400_106_105  0/75  Ram=4
+         ÃÄ@PSTRINGC7_2400_106_105  0/75  Ram=4
+         ÃÄ@PSTRINGC7_2400_106_105  0/75  Ram=4
+         ÃÄ@PSTRINGR_2400_106_105  (Inline)  Ram=2
+         ÃÄ@PSTRINGC7_2400_106_105  0/75  Ram=4
+         ÀÄ@PSTRINGC7_2400_106_105  0/75  Ram=4

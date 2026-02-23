@@ -1,0 +1,7 @@
+ by: Treuk, Velislei A
+   email: velislei@gmail.com
+   Copyright(c) 2010-2011
+   Sistemas de Monitoramento e bloqueio de fraudes em portas ADSL em Massa 
+   Projeto, excecução p/ Oi S/A
+   All Rights Reserveds       
+   Todos devem possuir pacotes de acesso a ssh/telnet instalados no Delphi

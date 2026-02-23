@@ -1,0 +1,181 @@
+004-005 @WRITE_PACKED_MEMORY.P1
+004-005 @MEMSET.P2
+004-005 @READ_PROGRAM_MEMORY8.P3
+004-005 @READ_PACKED_MEMORY.P4
+004-005 @WRITE_PROGRAM_MEMORY8.P5
+006-007 @READ_PACKED_MEMORY.P1
+006-007 @WRITE_PACKED_MEMORY.P2
+020     @INTERRUPT_AREA
+021     @INTERRUPT_AREA
+022     @INTERRUPT_AREA
+023     @INTERRUPT_AREA
+024     @INTERRUPT_AREA
+025     iDigNum
+026-034 cLinComRX
+035.0   bPrompt
+035.1   bBusLocalAtivo
+036-038 cMyID
+039     fixarBUS.iBus
+039     MAIN.@SCRATCH1
+03B     lerPortaCom.iPorta
+03C     lerPortaCom.cRX
+03D     lerPortaCom.cRxCmd
+03E     Comando.xLinRX
+03E     lerPortaCom.@SCRATCH1
+03F-04D Comando.cRes
+03F     lerPortaCom.@SCRATCH2
+040     lerPortaCom.@SCRATCH3
+041     lerPortaCom.@SCRATCH4
+04E     Comando.b
+04F     @delay_ms1.P1
+04F-06F,0A0-0A6 help.cHa
+04F     Comando.@SCRATCH1
+050     Comando.@SCRATCH2
+051     Comando.@SCRATCH3
+077     @SCRATCH
+077     @MEMSET.P1
+078     @SCRATCH
+078     @MEMSET.P1
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+0A7-0CE help.cHb
+0CF-0EF,120-126 help.cHc
+111.6   C1OUT
+113.6   C2OUT
+127     @PSTRINGCN7_2400_106_105.P1
+127     @PSTRINGR_2400_106_105.@SCRATCH1
+128     @PSTRINGR_2400_106_105.@SCRATCH2
+128     @PSTRINGCN7_2400_106_105.@SCRATCH1
+129     @PSTRINGCN7_2400_106_105.@SCRATCH2
+12A     @PSTRINGCN7_2400_106_105.@SCRATCH3
+12B     @PSTRINGCN7_2400_106_105.@SCRATCH4
+191-192 @WRITE_PROGRAM_MEMORY8.P1
+191-192 @READ_PROGRAM_MEMORY8.P2
+291     CCP_1
+291     CCP_1_LOW
+292     CCP_1_HIGH
+298     CCP_2
+298     CCP_2_LOW
+299     CCP_2_HIGH
+311     CCP_3_LOW
+311     CCP_3
+312     CCP_3_HIGH
+318     CCP_4_LOW
+318     CCP_4
+319     CCP_4_HIGH
+
+ROM Allocation:
+000021  cMod.call
+000022  cMod.data
+00002A  @const695.call
+00002C  @const701.call
+000030  cCI.call
+000030  cCI.data
+000034  cMsgFail.call
+000034  cMsgFail.data
+000042  @PSTRINGR_2400_106_105
+000059  @PSTRINGCN7_2400_106_105
+0000B0  @delay_ms1
+0000C6  @MEMSET
+0000CE  reset
+0000D4  RDA_isr
+0000D5  lerPortaCom
+000102  Comando
+000113  help
+0006B6  @const684.call
+0006C1  @const694.call
+0006CC  @const698.call
+0006D7  @const700.call
+0006E0  @const703.call
+0006E7  @const706.call
+0006F2  @const707.call
+0006FD  @const709.call
+000701  @const710.call
+000705  @const711.call
+000709  @const712.call
+00070D  @const713.call
+000711  @const714.call
+000715  @const715.call
+000719  @const716.call
+00071D  @const717.call
+000721  @const718.call
+000725  @const719.call
+000729  @const720.call
+00072D  @const721.call
+000731  @const722.call
+000735  @const723.call
+000739  @const724.call
+00073D  @const725.call
+000741  @const726.call
+000745  @const727.call
+000749  @const728.call
+00074D  @const729.call
+000751  @const730.call
+000755  @const731.call
+000759  @const732.call
+00075D  @const735.call
+000761  @const737.call
+000765  @const739.call
+000769  @const741.call
+00076D  @const743.call
+000771  @const745.call
+000775  @const747.call
+000779  @const749.call
+00077D  @const751.call
+000781  @const753.call
+000785  @const755.call
+000789  @const757.call
+00078D  @const759.call
+000791  @const761.call
+000795  @const763.call
+000799  @const765.call
+00079D  @const767.call
+0007A1  @const769.call
+0007A5  @const771.call
+0007A9  @const773.call
+0007AD  @const775.call
+0007B1  @const777.call
+0007B5  @const779.call
+0007B9  @const781.call
+0007BD  @const788.call
+0007C4  @const789.call
+0007CC  @cinit1
+0007CC  MAIN
+0007DD  @cinit2
+000800  _init
+00080B  fixarBUS
+
+Project Directory:
+    C:\Users\oi298979\Documents\Proteus\PIC\Serial_interrupt_n\Software\
+
+Project Files:
+    main.c                                                  [22-fev-22 09:36  CRC=6DEFFA45]
+    ..\..\Serial_interrupcao\Software\main.h                [22-fev-22 08:45  CRC=08AD79C4]
+    ..\..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F1827.h [03-jul-13 14:28  CRC=CC443070]
+
+Source signature=0F25D4E9
+
+Units:
+    main (main)
+
+Compiler Settings:
+    Processor:      PIC16F1827
+    Pointer Size:   16
+    ADC Range:      0-65535
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+    Enhanced 16:    Yes
+
+Output Files:
+    XREF file:   main.xsym
+    Errors:      main.err
+    Ext Symbols: main.esym
+    INHX8:       main.hex
+    Symbols:     main.sym
+    List:        main.lst
+    Debug/COFF:  main.cof
+    Project:     main.ccspjt
+    Call Tree:   main.tre
+    Statistics:  main.STA

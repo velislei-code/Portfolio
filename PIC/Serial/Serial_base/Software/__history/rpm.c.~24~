@@ -1,0 +1,74 @@
+#INCLUDE <16F628A.h>
+#FUSES INTRC_IO, NOWDT, NOMCLR
+#USE DELAY (INTERNAL=4M)
+#include <lcd.c>  
+
+  
+ #define LCD_ENABLE_PIN  PIN_B0                          
+ #define LCD_RS_PIN      PIN_B1                             
+ #define LCD_RW_PIN      PIN_B2                                    
+ #define LCD_DATA4       PIN_B4
+ #define LCD_DATA5       PIN_B5                                   
+ #define LCD_DATA6       PIN_B6                                    
+ #define LCD_DATA7       PIN_B7  
+
+int8 iPulsos, memPulsos;      //variable para almacenar datos del TMR0, de 8 bits( 0-255)
+int rpm;          //VARIABLE RPM
+#int_timer0       //interrupcion con timer 0
+int iTempo=0, maxTempo=0;
+float fFreq=0, fFreqAj=0;
+
+
+void interrupcion() // subrutina "interrupcion", puede llevar cualquier nombre
+{
+
+         set_timer0(0);  // cada vez que se desborde el conteo "interrupcion" el contador se reinicie en cero
+ 
+}
+
+
+void main(){
+
+            setup_timer_0(rtcc_ext_L_to_H|rtcc_div_1);// contador de estados bajos a altos| usaremos un prescaler de 1
+                                                      //si en caso pusieramos un prescaler de 2, cada dos pulsos los contaria como 1
+                                                      // el prescaler divide la frecuencia...eje dos helices.
+            set_timer0(0);                            //habilitamos la configuracio para que la iPulsos se inicie en cero
+            enable_interrupts(int_timer0);  //habilitamos la interrupcion que hemos declarado
+            enable_interrupts(GLOBAL);     //habilitamos tambien de forma global
+            
+            lcd_init();     //configuracion para inicializar el trabajo en LCD
+
+
+
+            WHILE (TRUE){
+            
+                      iPulsos = get_timer0();  //"get_timer" captura la funcion del registro y lo guarda en la variable "iPulsos"
+                      delay_ms(100);
+                      rpm = iPulsos;       // se multiplica por 60, por que 1Hz=60 RPM
+                      
+                      if(iPulsos > memPulsos){ memPulsos = iPulsos; }   // Armazena Num pulsos maior
+                      else{ // Se for menor pq atingiu limite, e voltou a zero, então exec...
+                          maxTempo = iTempo;
+                          fFreq = 255/maxTempo;
+                          fFreqAj = fFreq/60;
+                          iTempo = 0; 
+                          memPulsos = 0;
+                      
+                      }
+                      
+                      /*
+                      if(iPulsos >= 250){
+                           maxTempo = iTempo;
+                           fFreq = 255/iTempo;
+                           iTempo = 0;
+                           
+                      }
+                      */
+                      lcd_gotoxy(1,1);
+                      printf(LCD_PUTC,"RPM= %3u, T=%3u \n\r %lu...%lu hz",rpm, maxTempo, fFreq, fFreqAj); //muestra el conteo: %=configura la variable, 3=tres cifras, u=entera 
+                      //iPulsos = 0;
+                      iTempo++;
+             
+            }
+
+}

@@ -1,0 +1,15 @@
+program PrjEgide;
+
+uses
+  Forms,
+  UnMain in 'UnMain.pas' {Main},
+  DgSobre in 'DgSobre.pas' {OKRightDlg};
+
+{$R *.RES}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TMain, Main);
+  Application.CreateForm(TOKRightDlg, OKRightDlg);
+  Application.Run;
+end.

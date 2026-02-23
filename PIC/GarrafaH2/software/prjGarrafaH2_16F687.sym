@@ -1,0 +1,95 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+020     @SCRATCH
+021     @SCRATCH
+021     _RETURN_
+022     @SCRATCH
+023     @SCRATCH
+024     @INTERRUPT_AREA
+025     @INTERRUPT_AREA
+026     @INTERRUPT_AREA
+027     @INTERRUPT_AREA
+028     @INTERRUPT_AREA
+029     @INTERRUPT_AREA
+02A     @INTERRUPT_AREA
+02B     @INTERRUPT_AREA
+02C     @INTERRUPT_AREA
+02D     iDecSeg
+02E     iSeg
+02F     iMin
+030     iCircuito
+031     iBtnPress
+032     iStartCiclo
+033     iTempo
+034     iHabExecPoloNP
+035     iHabExecPoloPN
+036     iGerandoH2
+037     iModoEspera
+038     check_PressBtn.iBorda
+038     MAIN.@SCRATCH1
+039     MAIN.@SCRATCH2
+039     check_PressBtn.@SCRATCH1
+03D     piscaLED.iN
+03D     buzzer.iN
+03D     @MUL88.P1
+03D     Clock_PIC.@SCRATCH1
+03E     piscaLED.iT
+03E     buzzer.iT
+03E     @MUL88.P1
+03F     piscaLED.iQual
+03F     buzzer.bz
+040     piscaLED.p
+041     @delay_ms1.P1
+10D-10E @READ_PROGRAM_MEMORY8.P1
+11B.6   C2OUT
+11B.7   C1OUT
+
+ROM Allocation:
+000031  @delay_ms1
+000045  piscaLED
+000079  PoloPN
+00008C  @MUL88
+0000B1  buzzer
+0000C7  Aterrar
+0000D6  Stop
+0000EE  zerarClock
+0000F2  interrupt
+0000F7  Clock_PIC
+000133  PoloNP
+000183  inicializar
+000190  check_PressBtn
+0001DE  Start
+0001F6  MAIN
+0001F6  @cinit1
+00021E  @cinit2
+
+Project Directory:
+    D:\Projetos\PIC\GarrafaH2\software\
+
+Project Files:
+    prjGarrafaH2_16F687.c                                   [26-set-22 07:41  CRC=0A3F3ACA]
+    C:\Program Files (x86)\PICC\Devices\16F687.h            [03-jul-13 14:28  CRC=44741040]
+
+Source signature=93275B4A
+
+Units:
+    prjGarrafaH2_16F687 (main)
+
+Compiler Settings:
+    Processor:      PIC16F687
+    Pointer Size:   8
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   prjGarrafaH2_16F687.xsym
+    Errors:      prjGarrafaH2_16F687.err
+    Ext Symbols: prjGarrafaH2_16F687.esym
+    INHX8:       prjGarrafaH2_16F687.hex
+    Symbols:     prjGarrafaH2_16F687.sym
+    List:        prjGarrafaH2_16F687.lst
+    Debug/COFF:  prjGarrafaH2_16F687.cof
+    Project:     prjGarrafaH2_16F687.ccspjt
+    Call Tree:   prjGarrafaH2_16F687.tre
+    Statistics:  prjGarrafaH2_16F687.STA

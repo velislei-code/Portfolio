@@ -1,0 +1,8 @@
+>>> Warning 216 "prjGarrafaH2_16F687.c" Line 381(1,2): Interrupts disabled during call to prevent re-entrancy:  (buzzer)
+>>> Warning 216 "prjGarrafaH2_16F687.c" Line 381(1,2): Interrupts disabled during call to prevent re-entrancy:  (PoloPN)
+>>> Warning 216 "prjGarrafaH2_16F687.c" Line 381(1,2): Interrupts disabled during call to prevent re-entrancy:  (@delay_ms1)
+>>> Warning 216 "prjGarrafaH2_16F687.c" Line 381(1,2): Interrupts disabled during call to prevent re-entrancy:  (Aterrar)
+>>> Warning 216 "prjGarrafaH2_16F687.c" Line 381(1,2): Interrupts disabled during call to prevent re-entrancy:  (Stop)
+      Memory usage:   ROM=32%      RAM=21% - 27%
+      0 Errors,  5 Warnings.
+Build Successful.

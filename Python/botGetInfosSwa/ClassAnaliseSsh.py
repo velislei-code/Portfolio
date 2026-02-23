@@ -1,3 +1,12 @@
+"""
+ * by: Treuk, Velislei A
+ *   email: velislei@gmail.com
+ *   Copyright(c) 2025-2026
+ * 	 Ferramenta Bot p/ varredura de infos Switch/Routers
+ *   Projeto, excecução p/ VIVO S/A
+ *   All Rights Reserveds       
+"""
+
 #--import os
 #--- Posicionar janela --- #
 #--import ctypes

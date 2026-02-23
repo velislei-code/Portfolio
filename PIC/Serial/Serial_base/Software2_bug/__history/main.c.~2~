@@ -1,0 +1,15 @@
+#include <main.h>
+
+#include <lcd.c>
+
+void main()
+{
+   uart1.init(9600);
+   lcd_init();
+
+   while(TRUE)
+   {
+      //TODO: User Code
+   }
+
+}

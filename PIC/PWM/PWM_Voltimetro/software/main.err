@@ -1,0 +1,4 @@
+>>> Warning 202 "main.c" Line 44(7,16): Variable never used:   analogico
+      Memory usage:   ROM=24%      RAM=4% - 14%
+      0 Errors,  1 Warnings.
+Build Successful.

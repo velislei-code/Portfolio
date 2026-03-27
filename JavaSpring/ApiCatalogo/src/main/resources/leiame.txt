@@ -1,0 +1,11 @@
+/*https://www.youtube.com/watch?v=SqU9v_V32RA&t=60s 42m */
+
+Adicione as configs em: application.properties
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+    spring.datasource.driver-class-name=org.postgresql.Driver
+    spring.datasource.username=postgres
+    spring.datasource.password=admin
+    spring.datasource.url=jdbc:postgresql://localhost:5432/BDtstSpring
+    spring.jpa.generate-ddl=true
+    spring.jpa.hibernate.ddl-auto=update
+    spring.jpa.show-sql=true
